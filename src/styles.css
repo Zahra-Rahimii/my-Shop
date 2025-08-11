@@ -1,0 +1,131 @@
+@import "primeicons/primeicons.css";
+
+@font-face {
+  font-family: 'iran_yekan';
+  src: url('/assets/fonts/iranyekanwebthin.woff') format('woff');
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'iran_yekan';
+  src: url('/assets/fonts/iranyekanweblight.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'iran_yekan';
+  src: url('/assets/fonts/iranyekanwebregular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'iran_yekan';
+  src: url('/assets/fonts/iranyekanwebmedium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'iran_yekan';
+  src: url('/assets/fonts/iranyekanwebbold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'iran_yekan';
+  src: url('/assets/fonts/iranyekanwebextrabold.woff') format('woff');
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'iran_yekan';
+  src: url('/assets/fonts/iranyekanwebblack.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'iran_yekan';
+  src: url('/assets/fonts/iranyekanwebextrablack.woff') format('woff');
+  font-weight: 950;
+  font-style: normal;
+}
+
+body {
+  margin: 0;
+  font-family: 'iran_yekan', sans-serif !important;
+  direction: rtl;
+  background: linear-gradient(135deg, #1d3557, #457b9d);
+  color: #f1faee;
+}
+
+/* بازنویسی استایل‌های PrimeNG */
+.p-component {
+  font-family: 'iran_yekan', sans-serif !important;
+}
+
+.p-tree {
+  background: #457b9d !important;
+  border: 1px solid #1d3557 !important;
+  border-radius: 0.75rem !important;
+  padding: 1.5rem !important;
+  color: #1d3557 !important;
+}
+
+.p-treenode-content {
+  background: #a8dadc !important;
+  border-radius: 0.5rem !important;
+  padding: 0.75rem !important;
+  color: #1d3557 !important;
+}
+
+.p-treenode-content:hover {
+  background: #1d3557 !important;
+  color: #f1faee !important;
+}
+
+.p-treenode-label {
+  font-weight: 500 !important;
+}
+
+.p-button {
+  background: #1d3557 !important;
+  border: none !important;
+  color: #f1faee !important;
+  font-family: 'iran_yekan', sans-serif !important;
+  font-weight: 500 !important;
+  border-radius: 0.5rem !important;
+  transition: background 0.3s ease, transform 0.2s ease !important;
+}
+
+.p-button:hover {
+  background: #2b4a7a !important;
+  transform: scale(1.05) !important;
+}
+
+.p-button.p-button-danger {
+  background: #e63946 !important;
+}
+
+.p-button.p-button-danger:hover {
+  background: #c62834 !important;
+}
+
+.p-inputtext {
+  background: #f1faee !important;
+  border: 1px solid #1d3557 !important;
+  color: #1d3557 !important;
+  font-family: 'iran_yekan', sans-serif !important;
+  border-radius: 0.5rem !important;
+  padding: 0.75rem !important;
+}
+
+.p-inputtext:focus {
+  border-color: #a8dadc !important;
+  box-shadow: 0 0 0 2px #a8dadc !important;
+}

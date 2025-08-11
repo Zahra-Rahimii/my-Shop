@@ -1,0 +1,17 @@
+<div class="dashboard">
+  <h1>پنل مدیریت فروشگاه</h1>
+  <div class="dashboard-grid">
+    <div class="card">
+      <h2>درخت دسته‌بندی</h2>
+      <app-category-tree (nodeSelected)="onCategorySelected($event)" />
+    </div>
+    <div class="card">
+      <h2>مدیریت دسته‌بندی</h2>
+      <app-category-form [categoryId]="selectedCategoryId()" (categoryUpdated)="onCategoryUpdated()" />
+    </div>
+        <div class="card">
+      <h2>مدیریت محصولات</h2>
+      <app-product-form />
+    </div>
+  </div>
+</div>

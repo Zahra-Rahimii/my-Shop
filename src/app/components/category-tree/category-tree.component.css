@@ -1,0 +1,49 @@
+.tree-container {
+  background: #457b9d;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid #1d3557;
+}
+
+.node-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: #a8dadc;
+  border-radius: 0.5rem;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.node-content:hover {
+  background: #1d3557;
+  color: #f1faee;
+}
+
+.node-content span {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1d3557;
+}
+
+.node-content:hover span {
+  color: #f1faee;
+}
+
+.node-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.edit-btn, .delete-btn {
+  font-size: 1.1rem;
+  padding: 0.25rem;
+}
+
+.node-content:hover .edit-btn {
+  color: #f1faee !important;
+}
+
+.node-content:hover .delete-btn {
+  color: #e63946 !important;
+}
