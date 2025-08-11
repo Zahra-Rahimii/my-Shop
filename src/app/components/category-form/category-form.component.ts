@@ -2,7 +2,7 @@ import { Component, signal, input, output, OnInit, inject, effect, SimpleChanges
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CategoryService } from '../../services/category.service';
 import { AttributeService } from '../../services/attribute.service';
-import { Category, CategoryDTO } from '../../models/category.model';
+import { Category, CategoryDTO, CategoryTreeNodeDTO } from '../../models/category.model';
 import { Attribute, CategoryAttribute, CategoryAttributeDTO, AttributeType } from '../../models/attribute.model';
 import { CommonModule } from '@angular/common';
 import { InputTextModule } from 'primeng/inputtext';
@@ -42,7 +42,6 @@ export class CategoryFormComponent implements OnInit, OnChanges {
   private attributeService = inject(AttributeService);
 
   constructor(private fb: FormBuilder) {
-    // مقداردهی فرم در constructor
     this.categoryForm = this.fb.group({
       name: ['', Validators.required],
       description: [''],
@@ -59,7 +58,6 @@ export class CategoryFormComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    // نیازی به مقداردهی فرم اینجا نیست
     this.loadCategories();
   }
 
@@ -115,9 +113,19 @@ export class CategoryFormComponent implements OnInit, OnChanges {
     });
   }
 
-  private flattenCategories(categories: Category[]): Category[] {
-    return categories.flatMap(cat => [cat, ...this.flattenCategories(cat.children || [])]);
-  }
+
+  private flattenCategories(nodes: CategoryTreeNodeDTO[]): Category[] {
+  return nodes.flatMap(node => [
+    {
+      id: node.data.id,
+      name: node.label, 
+      description: node.data.description,
+      parentId: null, 
+      children: []
+    },
+    ...this.flattenCategories(node.children || [])
+  ]);
+}
 
   addAttribute() {
     const attributeName = this.categoryForm.get('attributeName')?.value;
@@ -167,66 +175,7 @@ export class CategoryFormComponent implements OnInit, OnChanges {
       this.categoryAttributes.update(attrs => attrs.filter((_, i) => i !== index));
     }
   }
-
-  // onSubmit() {
-  //   if (this.categoryForm.valid) {
-  //     const attributeName = this.categoryForm.get('attributeName')?.value;
-  //     const attributeType = this.categoryForm.get('attributeType')?.value;
-  //     if (attributeName || attributeType) {
-  //       alert('ویژگی جدید وارد شده اما اضافه نشده است. لطفاً ابتدا ویژگی را اضافه کنید.');
-  //       return;
-  //     }
-  //     if (this.categoryAttributes().length === 0) {
-  //       alert('حداقل یک ویژگی اضافه کنید.');
-  //       return;
-  //     }
-  //     const categoryDTO: CategoryDTO = {
-  //       name: this.categoryForm.get('name')?.value,
-  //       description: this.categoryForm.get('description')?.value,
-  //       parentId: this.categoryForm.get('parentId')?.value
-  //     };
-
-  //     const categoryRequest = this.editMode()
-  //       ? this.categoryService.updateCategory(this.categoryId()!, categoryDTO)
-  //       : this.categoryService.addCategory(categoryDTO);
-
-  //     categoryRequest.subscribe({
-  //       next: (category) => {
-  //         const categoryId = category.id;
-  //         this.categoryAttributes().forEach(attr => {
-  //           if (!attr.id) {
-  //             const categoryAttributeDTO: CategoryAttributeDTO = {
-  //               categoryId,
-  //               attributeId: attr.attributeId,
-  //               required: attr.required
-  //             };
-  //             this.attributeService.addCategoryAttribute(categoryAttributeDTO).subscribe({
-  //               next: (newCatAttr) => {
-  //                 this.categoryAttributes.update(attrs =>
-  //                   attrs.map(a => (a.attributeId === attr.attributeId && !a.id ? { ...a, id: newCatAttr.id } : a))
-  //                 );
-  //               },
-  //               error: (err) => {
-  //                 console.error('خطا در افزودن ویژگی دسته‌بندی:', err);
-  //                 alert('خطایی در افزودن ویژگی رخ داد.');
-  //               }
-  //             });
-  //           }
-  //         });
-  //         this.categoryUpdated.emit();
-  //         this.categoryForm.reset();
-  //         this.categoryAttributes.set([]);
-  //         this.editMode.set(false);
-  //       },
-  //       error: (err) => {
-  //         console.error('خطا در ذخیره دسته‌بندی:', err);
-  //         alert('خطایی در ذخیره دسته‌بندی رخ داد.');
-  //       }
-  //     });
-  //   }
-  // }
-
-
+  
   onSubmit() {
     if (this.categoryForm.valid) {
         const attributeName = this.categoryForm.get('attributeName')?.value;

@@ -11,3 +11,10 @@ export interface CategoryDTO {
   description?: string;
   parentId?: number | null; // اضافه کردن null
 }
+
+export interface CategoryTreeNodeDTO {
+  key: string;
+  label: string;
+  data: { id: number; description: string };
+  children: CategoryTreeNodeDTO[];
+}

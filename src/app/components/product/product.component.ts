@@ -53,7 +53,7 @@ export class ProductFormComponent implements OnInit {
       attributeValues: this.fb.array([])
     });
 
-    this.categoryService.getCategories().subscribe(cats => this.categories.set(cats));
+    // this.categoryService.getCategories().subscribe(cats => this.categories.set(cats));
 
     this.productForm.get('categoryId')?.valueChanges.subscribe(categoryId => {
       if (categoryId) {

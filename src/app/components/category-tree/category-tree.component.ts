@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, signal, inject } from '@angular/core';
 import { CategoryService } from '../../services/category.service';
-import { Category } from '../../models/category.model';
+import { CategoryTreeNodeDTO } from '../../models/category.model';
 import { TreeNode } from 'primeng/api';
 import { CommonModule } from '@angular/common';
 import { TreeModule } from 'primeng/tree';
@@ -25,6 +25,7 @@ export class CategoryTreeComponent {
   loadCategories() {
     this.categoryService.getCategories().subscribe({
       next: (cats) => {
+        console.log('دسته‌بندی‌های دریافتی:', JSON.stringify(cats, null, 2)); // لاگ برای دیباگ
         this.categories.set(this.mapCategoriesToTreeNodes(cats));
       },
       error: (err) => {
@@ -34,17 +35,24 @@ export class CategoryTreeComponent {
     });
   }
 
-  mapCategoriesToTreeNodes(categories: Category[]): TreeNode[] {
-    return categories.map(category => ({
-      key: category.id.toString(),
-      label: category.name,
-      data: { id: category.id, description: category.description },
-      children: category.children ? this.mapCategoriesToTreeNodes(category.children) : []
-    }));
+  mapCategoriesToTreeNodes(categories: CategoryTreeNodeDTO[]): TreeNode[] {
+    return categories
+      .filter(category => category && category.data && category.data.id != null) // فیلتر دسته‌های معتبر
+      .map(category => ({
+        key: category.key, // استفاده از key که از سرور میاد
+        label: category.label || 'بدون نام',
+        data: {
+          id: category.data.id,
+          description: category.data.description || ''
+        },
+        children: category.children ? this.mapCategoriesToTreeNodes(category.children) : []
+      }));
   }
 
   selectNode(event: any) {
-    this.nodeSelected.emit(Number(event.node.key));
+    if (event.node && event.node.data && event.node.data.id) {
+      this.nodeSelected.emit(Number(event.node.data.id));
+    }
   }
 
   deleteCategory(id: number) {
