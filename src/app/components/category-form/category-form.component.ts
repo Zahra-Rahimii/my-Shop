@@ -232,6 +232,7 @@ export class CategoryFormComponent implements OnInit, OnChanges {
                     }
                 });
                 this.categoryUpdated.emit();
+                this.loadCategories();
                 this.categoryForm.reset();
                 this.categoryAttributes.set([]);
                 this.editMode.set(false);

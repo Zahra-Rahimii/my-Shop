@@ -15,7 +15,7 @@ import { ButtonModule } from 'primeng/button';
 })
 export class CategoryTreeComponent {
   categories = signal<TreeNode[]>([]);
-  @Output() nodeSelected = new EventEmitter<number>();
+  @Output() nodeSelected = new EventEmitter<number | null>();
   private categoryService = inject(CategoryService);
 
   constructor() {
@@ -52,18 +52,29 @@ export class CategoryTreeComponent {
   selectNode(event: any) {
     if (event.node && event.node.data && event.node.data.id) {
       this.nodeSelected.emit(Number(event.node.data.id));
+    }else{
+      this.nodeSelected.emit(null);
     }
   }
 
-  deleteCategory(id: number) {
+deleteCategory(id: number) {
     this.categoryService.deleteCategory(id).subscribe({
-      next: () => {
-        this.loadCategories();
-      },
-      error: (err) => {
-        console.error('خطا در حذف دسته‌بندی:', err);
-        alert('خطایی در حذف دسته‌بندی رخ داد.');
-      }
+        next: () => {
+            console.log('دسته‌بندی حذف شد');
+            this.loadCategories();
+            this.nodeSelected.emit(null);
+            // به‌روزرسانی UI
+        },
+        error: (err) => {
+            console.error('خطا در حذف دسته‌بندی:', err);
+            let errorMessage = 'خطایی در حذف دسته‌بندی رخ داد.';
+            if (err.status === 400) {
+                errorMessage = err.error || 'دسته‌بندی به دلیل وجود زیرمجموعه‌ها قابل حذف نیست.';
+            } else if (err.status === 404) {
+                errorMessage = 'دسته‌بندی یافت نشد.';
+            }
+            alert(errorMessage);
+        }
     });
-  }
+}
 }

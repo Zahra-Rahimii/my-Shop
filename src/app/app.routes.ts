@@ -1,7 +1,21 @@
 import { Routes } from '@angular/router';
-import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 
 export const routes: Routes = [
-  { path: 'admin', component: AdminDashboardComponent },
-  { path: '', redirectTo: '/admin', pathMatch: 'full' }
+  {
+    path: '',
+    redirectTo: '/admin',
+    pathMatch: 'full'
+  },
+  {
+    path: 'admin',
+    loadComponent: () => 
+      import('./components/admin-dashboard/admin-dashboard.component')
+        .then(c => c.AdminDashboardComponent)
+  },
+  {
+    path:'test',
+    loadComponent: () =>
+      import('./components/testprimeng/testprimeng.component')
+       .then(c => c.TestprimengComponent)
+  }
 ];
