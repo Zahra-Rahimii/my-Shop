@@ -14,7 +14,7 @@ export class AdminDashboardComponent {
   selectedCategoryId = signal<number | null>(null);
   @ViewChild(CategoryTreeComponent) categoryTree!: CategoryTreeComponent;
 
-  onCategorySelected(id: number) {
+  onCategorySelected(id: number | null) {
     this.selectedCategoryId.set(id);
   }
 

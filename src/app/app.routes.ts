@@ -12,10 +12,10 @@ export const routes: Routes = [
       import('./components/admin-dashboard/admin-dashboard.component')
         .then(c => c.AdminDashboardComponent)
   },
-  {
-    path:'test',
-    loadComponent: () =>
-      import('./components/testprimeng/testprimeng.component')
-       .then(c => c.TestprimengComponent)
-  }
+  // {
+  //   path:'test',
+  //   loadComponent: () =>
+  //     import('./testprimeng/testprimeng.component')
+  //      .then(c => c.TestprimengComponent)
+  // }
 ];
