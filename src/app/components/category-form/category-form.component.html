@@ -1,9 +1,10 @@
-<!-- category-form.component.html (اصلاح برای p-select attributeType با label/value) -->
 <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" class="form-container">
   <div class="form-group">
     <label for="name">نام دسته</label>
     <input pInputText id="name" formControlName="name" placeholder="نام دسته" />
-    <span class="error" *ngIf="categoryForm.get('name')?.touched && categoryForm.get('name')?.invalid">نام دسته اجباری است</span>
+    @if(categoryForm.get('name')?.touched && categoryForm.get('name')?.invalid){
+      <span class="error">نام دسته اجباری است</span>
+    }
   </div>
   <div class="form-group">
     <label for="description">توضیحات</label>
@@ -31,18 +32,23 @@
         optionValue="value"
         placeholder="نوع ویژگی"
       />
+      <!-- این چیه؟؟ -->
       <p-checkbox formControlName="required" label="اجباری" binary="true"></p-checkbox>
       <button pButton type="button" label="اضافه کردن ویژگی" class="add-attribute-btn" (click)="addAttribute()"></button>
     </div>
   </div>
-  <div class="attributes-list" *ngIf="categoryAttributes().length">
-    <h3>ویژگی‌های دسته</h3>
+ @if(categoryAttributes().length){
+<div class="attributes-list">
+     <h3>ویژگی‌های دسته</h3>
     <ul>
-      <li *ngFor="let attr of categoryAttributes(); let i = index">
+      @for(attr of categoryAttributes(); track attr; let i = $index){
+        <li>
         {{ attr.attributeName }} ({{ attr.attributeType }}) {{ attr.required ? '(اجباری)' : '' }}
         <button pButton type="button" icon="pi pi-trash" class="p-button-danger remove-attribute-btn" (click)="removeAttribute(i)"></button>
       </li>
+      }
     </ul>
-  </div>
+</div>
+}
   <button pButton type="submit" [label]="editMode() ? 'ویرایش دسته' : 'ثبت دسته'" class="submit-btn" [disabled]="categoryForm.invalid"></button>
 </form>
