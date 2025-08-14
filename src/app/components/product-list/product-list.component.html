@@ -1,6 +1,7 @@
 <h2>لیست کالاها</h2>
 <div class="grid">
-  <div *ngFor="let item of listings; let idx = index" class="col-12 md:col-6 lg:col-4">
+  @for (item of listings; track item.id; let idx = $index) {
+  <div class="col-12 md:col-6 lg:col-4">
     <p-card [header]="item.title" class="mb-3 shadow-2">
       <ng-template pTemplate="content">
         <div class="flex flex-column gap-2">
@@ -13,18 +14,23 @@
             </p-tag>
           </span>
           <br>
-          <span *ngIf="item.description">
+          @if (item.description) {
+          <span>
             <strong>توضیحات:</strong> {{ item.description }}
           </span>
-          <div *ngFor="let attr of item.attributeValues">
+          }
+          @for (attr of item.attributeValues; track attr.attributeName) {
+          <div>
             <strong>{{ attr.attributeName }}:</strong> {{ attr.value }}
           </div>
+          }
         </div>
       </ng-template>
       <ng-template pTemplate="footer">
         <button pButton type="button" label="حذف" class="p-button-danger"
           (click)="deleteProduct(item.id, idx)"></button>
       </ng-template>
-
     </p-card>
   </div>
+  }
+</div>
