@@ -1,34 +1,33 @@
-import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { BaseService } from './base.service';
 
 import { Product, ProductDTO, ProductAttributeValue, ProductAttributeValueDTO } from '../models/product.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ProductService {
-  private apiUrl = 'http://192.168.113.143:8080/api/products';
-  private productAttributeApiUrl = 'http://192.168.113.143:8080/api/product-attributes';
-  private http = inject(HttpClient);
+export class ProductService extends BaseService {
+  private readonly productsEndpoint = 'products';
+  private readonly productAttributesEndpoint = 'product-attributes';
 
   getProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(this.apiUrl);
+    return this.get<Product[]>(this.productsEndpoint);
   }
 
   addProduct(product: ProductDTO): Observable<Product> {
-    return this.http.post<Product>(this.apiUrl, product);
+    return this.post<Product>(this.productsEndpoint, product);
   }
 
   addProductAttribute(productAttribute: ProductAttributeValueDTO): Observable<ProductAttributeValue> {
-    return this.http.post<ProductAttributeValue>(this.productAttributeApiUrl, productAttribute);
+    return this.post<ProductAttributeValue>(this.productAttributesEndpoint, productAttribute);
   }
 
   getProductAttributes(productId: number): Observable<ProductAttributeValue[]> {
-    return this.http.get<ProductAttributeValue[]>(`${this.productAttributeApiUrl}?productId=${productId}`);
+    return this.get<ProductAttributeValue[]>(`${this.productAttributesEndpoint}?productId=${productId}`);
   }
+
   deleteProduct(productId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${productId}`);
+    return this.delete<void>(`${this.productsEndpoint}/${productId}`);
   }
-  
 }

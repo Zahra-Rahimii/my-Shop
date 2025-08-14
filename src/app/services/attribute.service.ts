@@ -1,46 +1,45 @@
-import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { BaseService } from './base.service';
 
-import { Attribute, CategoryAttribute, CategoryAttributeDTO, AttributeType } from '../models/attribute.model';
+import { Attribute, CategoryAttribute, CategoryAttributeDTO } from '../models/attribute.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AttributeService {
-  private apiUrl = 'http://192.168.113.143:8080/api/attributes';
-  private categoryAttributeApiUrl = 'http://192.168.113.143:8080/api/category-attributes';
-  private http = inject(HttpClient);
+export class AttributeService extends BaseService {
+  private readonly attributesEndpoint = 'attributes';
+  private readonly categoryAttributesEndpoint = 'category-attributes';
 
   getAttributes(): Observable<Attribute[]> {
-    return this.http.get<Attribute[]>(this.apiUrl);
+    return this.get<Attribute[]>(this.attributesEndpoint);
   }
 
   getAttribute(id: number): Observable<Attribute> {
-    return this.http.get<Attribute>(`${this.apiUrl}/${id}`);
+    return this.get<Attribute>(`${this.attributesEndpoint}/${id}`);
   }
 
   addAttribute(attribute: Attribute): Observable<Attribute> {
-    return this.http.post<Attribute>(this.apiUrl, attribute);
+    return this.post<Attribute>(this.attributesEndpoint, attribute);
   }
 
   updateAttribute(id: number, attribute: Attribute): Observable<Attribute> {
-    return this.http.put<Attribute>(`${this.apiUrl}/${id}`, attribute);
+    return this.put<Attribute>(`${this.attributesEndpoint}/${id}`, attribute);
   }
 
   deleteAttribute(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.delete<void>(`${this.attributesEndpoint}/${id}`);
   }
 
   addCategoryAttribute(categoryAttribute: CategoryAttributeDTO): Observable<CategoryAttribute> {
-    return this.http.post<CategoryAttribute>(this.categoryAttributeApiUrl, categoryAttribute);
+    return this.post<CategoryAttribute>(this.categoryAttributesEndpoint, categoryAttribute);
   }
 
   getCategoryAttributes(categoryId: number): Observable<CategoryAttribute[]> {
-    return this.http.get<CategoryAttribute[]>(`${this.categoryAttributeApiUrl}/category/${categoryId}`);
+    return this.get<CategoryAttribute[]>(`${this.categoryAttributesEndpoint}/category/${categoryId}`);
   }
 
   deleteCategoryAttribute(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.categoryAttributeApiUrl}/${id}`);
+    return this.delete<void>(`${this.categoryAttributesEndpoint}/${id}`);
   }
 }
