@@ -1,14 +1,15 @@
 import { Component, signal, input, output, OnInit, inject, effect, SimpleChanges, OnChanges } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CategoryService } from '../../services/category.service';
-import { AttributeService } from '../../services/attribute.service';
-import { Category, CategoryDTO, CategoryTreeNodeDTO } from '../../models/category.model';
-import { Attribute, CategoryAttribute, CategoryAttributeDTO, AttributeType } from '../../models/attribute.model';
 import { CommonModule } from '@angular/common';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from 'primeng/button';
+
+import { Attribute, CategoryAttribute, CategoryAttributeDTO, AttributeType } from '../../models/attribute.model';
+import { Category, CategoryDTO, CategoryTreeNodeDTO } from '../../models/category.model';
+import { CategoryService } from '../../services/category.service';
+import { AttributeService } from '../../services/attribute.service';
 
 @Component({
   selector: 'app-category-form',

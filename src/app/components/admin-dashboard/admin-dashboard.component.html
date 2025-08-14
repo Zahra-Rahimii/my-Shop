@@ -9,9 +9,13 @@
       <h2>مدیریت دسته‌بندی</h2>
       <app-category-form [categoryId]="selectedCategoryId()" (categoryUpdated)="onCategoryUpdated()" />
     </div>
-        <div class="card">
+    <div class="card">
       <h2>مدیریت محصولات</h2>
       <app-product-form />
+    </div>
+    <div class="card">
+      <h2>محصولات</h2>
+      <app-product-list #productList></app-product-list>
     </div>
   </div>
 </div>

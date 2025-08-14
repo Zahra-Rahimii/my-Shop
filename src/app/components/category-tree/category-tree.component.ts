@@ -1,15 +1,19 @@
 import { Component, Output, EventEmitter, signal, inject } from '@angular/core';
-import { CategoryService } from '../../services/category.service';
-import { CategoryTreeNodeDTO } from '../../models/category.model';
-import { TreeNode } from 'primeng/api';
 import { CommonModule } from '@angular/common';
+import { TreeNode } from 'primeng/api';
 import { TreeModule } from 'primeng/tree';
 import { ButtonModule } from 'primeng/button';
+
+import { CategoryService } from '../../services/category.service';
+import { CategoryTreeNodeDTO } from '../../models/category.model';
 
 @Component({
   selector: 'app-category-tree',
   standalone: true,
-  imports: [CommonModule, TreeModule, ButtonModule],
+  imports: [
+    CommonModule,
+    TreeModule,
+    ButtonModule],
   templateUrl: './category-tree.component.html',
   styleUrls: ['./category-tree.component.css']
 })

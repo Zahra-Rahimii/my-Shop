@@ -11,11 +11,6 @@ export const routes: Routes = [
     loadComponent: () => 
       import('./components/admin-dashboard/admin-dashboard.component')
         .then(c => c.AdminDashboardComponent)
-  },
-  // {
-  //   path:'test',
-  //   loadComponent: () =>
-  //     import('./testprimeng/testprimeng.component')
-  //      .then(c => c.TestprimengComponent)
-  // }
+  }
+
 ];

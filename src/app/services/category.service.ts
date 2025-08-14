@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+
 import { Category, CategoryDTO, CategoryTreeNodeDTO } from '../models/category.model';
 
 @Injectable({

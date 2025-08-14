@@ -1,0 +1,48 @@
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: bold;
+  color: #1d3557;
+}
+
+.listing-item {
+  background: #f1faee;
+  border: 1px solid #1d3557;
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.listing-item:hover {
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+  transform: translateY(-3px);
+}
+
+.listing-item h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: #1d3557;
+  font-weight: 600;
+}
+
+.p-card-body {
+  background: #f1faee;
+}
+
+.listing-item p {
+  margin: 0.25rem 0;
+  color: #1d3557;
+}
+
+.listing-item p:first-of-type {
+  font-weight: 600;
+  color: #457b9d;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #a8dadc;
+  margin-top: 15px;
+}
