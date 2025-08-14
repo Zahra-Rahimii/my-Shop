@@ -2,33 +2,33 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { Category, CategoryDTO, CategoryTreeNodeDTO } from '../models/category.model';
+import { Product, ProductDTO, ProductAttributeValue, ProductAttributeValueDTO } from '../models/product.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class CategoryService {
-  private apiUrl = 'http://192.168.113.143:8080/api/categories';
-  private treeApiUrl = 'http://192.168.113.143:8080/api/categories/tree';
+export class ProductService {
+  private apiUrl = 'http://192.168.113.143:8080/api/products';
+  private productAttributeApiUrl = 'http://192.168.113.143:8080/api/product-attributes';
   private http = inject(HttpClient);
 
-  getCategories(): Observable<CategoryTreeNodeDTO[]> {
-    return this.http.get<CategoryTreeNodeDTO[]>(this.treeApiUrl);
+  getProducts(): Observable<Product[]> {
+    return this.http.get<Product[]>(this.apiUrl);
   }
 
-  getCategory(id: number): Observable<Category> {
-    return this.http.get<Category>(`${this.apiUrl}/${id}`);
+  addProduct(product: ProductDTO): Observable<Product> {
+    return this.http.post<Product>(this.apiUrl, product);
   }
 
-  addCategory(category: CategoryDTO): Observable<Category> {
-    return this.http.post<Category>(this.apiUrl, category);
+  addProductAttribute(productAttribute: ProductAttributeValueDTO): Observable<ProductAttributeValue> {
+    return this.http.post<ProductAttributeValue>(this.productAttributeApiUrl, productAttribute);
   }
 
-  updateCategory(id: number, category: CategoryDTO): Observable<Category> {
-    return this.http.put<Category>(`${this.apiUrl}/${id}`, category);
+  getProductAttributes(productId: number): Observable<ProductAttributeValue[]> {
+    return this.http.get<ProductAttributeValue[]>(`${this.productAttributeApiUrl}?productId=${productId}`);
   }
-
-  deleteCategory(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  deleteProduct(productId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${productId}`);
   }
+  
 }
