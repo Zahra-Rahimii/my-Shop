@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BaseService } from './base.service';
 
+import { BaseService } from './base.service';
 import { Product, ProductDTO, ProductAttributeValue, ProductAttributeValueDTO } from '../models/product.model';
 
 @Injectable({

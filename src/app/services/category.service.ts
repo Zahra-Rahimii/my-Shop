@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BaseService } from './base.service';
 
+import { BaseService } from './base.service';
 import { Category, CategoryDTO, CategoryTreeNodeDTO } from '../models/category.model';
 
 @Injectable({

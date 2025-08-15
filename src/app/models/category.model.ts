@@ -1,4 +1,4 @@
-import { AttributeType } from "./attribute.model";
+import { AttributeType, CategoryAttributeDTO } from "./attribute.model";
 
 export interface Category {
   id: number;
@@ -14,13 +14,22 @@ export interface CategoryDTO {
   parentId?: number | null;
 }
 
+// export interface CategoryTreeNodeDTO {
+//   key: string;
+//   label: string;
+//   data: { id: number; description: string };
+//   children: CategoryTreeNodeDTO[];
+// }
+
 export interface CategoryTreeNodeDTO {
   key: string;
   label: string;
-  data: { id: number; description: string };
-  children: CategoryTreeNodeDTO[];
+  data: { id: number; description: string; parentId: number | null };
+  children?: CategoryTreeNodeDTO[];
+  attributes?: CategoryAttributeDTO[]; // هماهنگ با بک‌اند
 }
 
+/*چیکار میکنه؟؟؟؟*/
 export interface CategoryAttribute {
   attributeId: number;
   name: string;
