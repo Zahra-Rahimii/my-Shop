@@ -219,7 +219,7 @@ import { CategoryService } from '../../services/category.service';
 import { AttributeService } from '../../services/attribute.service';
 import { ProductDTO } from '../../models/product.model';
 import { CategoryTreeNodeDTO } from '../../models/category.model';
-import { CategoryAttribute, AttributeType } from '../../models/attribute.model';
+import { CategoryAttributeDTO, AttributeType } from '../../models/attribute.model';
 
 @Component({
   selector: 'app-product-form',
@@ -242,7 +242,7 @@ export class ProductFormComponent implements OnInit, OnChanges {
   productForm!: FormGroup;
   categories = signal<CategoryTreeNodeDTO[]>([]);
   mappedCategories = signal<{ id: number; name: string }[]>([]);
-  categoryAttributes = signal<CategoryAttribute[]>([]);
+  categoryAttributes = signal<CategoryAttributeDTO[]>([]);
   attributeTypes = signal(Object.values(AttributeType));
   @Input() categoryId!: number | null;
   @Output() productAdded = new EventEmitter<void>();
@@ -314,7 +314,7 @@ export class ProductFormComponent implements OnInit, OnChanges {
     });
   }
 
-  updateAttributeValuesFormArray(attributes: CategoryAttribute[]) {
+  updateAttributeValuesFormArray(attributes: CategoryAttributeDTO[]) {
     this.attributeValuesFormArray.clear();
     attributes.forEach((attr) => {
       const validator = attr.required ? [Validators.required] : [];

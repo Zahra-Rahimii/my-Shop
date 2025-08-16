@@ -1,4 +1,4 @@
-.tree-container {
+/* .tree-container {
   background: #457b9d;
   padding: 1.5rem;
   border-radius: 0.75rem;
@@ -46,4 +46,85 @@
 
 .node-content:hover .delete-btn {
   color: #e63946 !important;
+} */
+
+
+
+
+.tree-container {
+  background: #457b9d;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid #1d3557;
+}
+
+.node-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: #a8dadc;
+  border-radius: 0.5rem;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.node-content:hover {
+  background: #1d3557;
+  color: #f1faee;
+}
+
+.node-content span {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1d3557;
+}
+
+.node-content:hover span {
+  color: #f1faee;
+}
+
+.node-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.show-attributes-btn, .edit-btn, .delete-btn {
+  font-size: 1.1rem;
+  padding: 0.25rem;
+}
+
+.node-content:hover .show-attributes-btn {
+  color: #f1faee !important;
+}
+
+.node-content:hover .edit-btn {
+  color: #f1faee !important;
+}
+
+.node-content:hover .delete-btn {
+  color: #e63946 !important;
+}
+
+.attributes-dialog .p-dialog-content {
+  background: #a8dadc;
+  color: #1d3557;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.attribute-item {
+  font-size: 0.9rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid #1d3557;
+}
+
+.attribute-item:last-child {
+  border-bottom: none;
+}
+
+.no-attributes {
+  font-size: 0.9rem;
+  color: #1d3557;
+  padding: 0.5rem;
+  text-align: center;
 }

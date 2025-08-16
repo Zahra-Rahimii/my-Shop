@@ -105,6 +105,11 @@
   font-weight: 400;
 }
 
+.attributes-list li.inherited {
+  background: #d8e2dc;
+  opacity: 0.8;
+}
+
 .remove-attribute-btn {
   background: #e63946;
   color: #f1faee;
