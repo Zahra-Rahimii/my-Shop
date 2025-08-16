@@ -48,6 +48,7 @@ export class BaseService {
       errorMessage = 'خطای سرور. لطفاً بعداً تلاش کنید.';
     }
 
+    this.messageService.clear(); 
     this.messageService.add({
       severity: 'error',
       summary: 'خطا',
