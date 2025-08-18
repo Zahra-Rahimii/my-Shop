@@ -6,12 +6,12 @@ export const routes: Routes = [
     redirectTo: '/home',
     pathMatch: 'full',
   },
-  {
-    path: 'home',
-    loadComponent: () =>
-      import('./components/home/home.component')
-        .then(c => c.HomeComponent),
-  },
+  // {
+  //   path: 'home',
+  //   loadComponent: () =>
+  //     import('./components/home/home.component')
+  //       .then(c => c.HomeComponent),
+  // },
   {
     path: 'admin',
     loadComponent: () =>
@@ -36,10 +36,10 @@ export const routes: Routes = [
       import('./components/product/product.component')
         .then(c => c.ProductFormComponent),
   },
-  {
-    path: 'product-list',
-    loadComponent: () =>
-      import('./components/product-list/product-list/product-list.component')
-        .then(c => c.ProductListComponent),
-  },
+  // {
+  //   path: 'product-list',
+  //   loadComponent: () =>
+  //     import('./components/product-list/product-list/product-list.component')
+  //       .then(c => c.ProductListComponent),
+  // },
 ];

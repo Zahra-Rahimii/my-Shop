@@ -56,4 +56,11 @@ export class CategoryService extends BaseService {
       catchError(this.handleError)
     );
   }
+
+  /**شتیبانی از لود تدریجی p-tree */
+  getCategoryChildren(parentId: number): Observable<CategoryTreeNodeDTO[]> {
+    return this.get<CategoryTreeNodeDTO[]>(`${this.categoriesEndpoint}/${parentId}/children`).pipe(
+      catchError(this.handleError)
+    );
+  }
 }
