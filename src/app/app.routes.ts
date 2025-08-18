@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: '/home',
+    redirectTo: '/admin',
     pathMatch: 'full',
   },
   // {
@@ -33,13 +33,13 @@ export const routes: Routes = [
   {
     path: 'add-product',
     loadComponent: () =>
-      import('./components/product/product.component')
+      import('./components/product-form/product-form.component')
         .then(c => c.ProductFormComponent),
   },
-  // {
-  //   path: 'product-list',
-  //   loadComponent: () =>
-  //     import('./components/product-list/product-list/product-list.component')
-  //       .then(c => c.ProductListComponent),
-  // },
+  {
+    path: 'product-list',
+    loadComponent: () =>
+      import('./components/product-list/product-list.component')
+        .then(c => c.ProductListComponent),
+  },
 ];
