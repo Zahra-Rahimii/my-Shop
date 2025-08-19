@@ -42,18 +42,19 @@
 // }
 
 import { Component, inject, signal } from '@angular/core';
-import { CategoryService } from '../../services/category.service';
-import { AttributeService } from '../../services/attribute.service';
 import { TreeNode } from 'primeng/api';
-import { CategoryTreeNodeDTO } from '../../models/category.model';
-import { CategoryAttributeDTO } from '../../models/attribute.model';
 import { MessageService } from 'primeng/api';
-import { TableModule } from 'primeng/table'; // اگر جدول می‌خواهید
-import { TooltipModule } from 'primeng/tooltip'; // اختیاری
+import { TableModule } from 'primeng/table';
+import { TooltipModule } from 'primeng/tooltip';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { TreeModule } from 'primeng/tree';
+
+import { CategoryService } from '../../services/category.service';
+import { AttributeService } from '../../services/attribute.service';
+import { CategoryTreeNodeDTO } from '../../models/category.model';
+import { CategoryAttributeDTO } from '../../models/attribute.model';
 
 @Component({
   selector: 'app-tree-view',

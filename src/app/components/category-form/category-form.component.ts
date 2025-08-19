@@ -1,13 +1,13 @@
 import { Component, signal, input, output, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { distinctUntilChanged, switchMap, expand, reduce, of } from 'rxjs';
+import { take } from 'rxjs';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
-import { distinctUntilChanged, switchMap, expand, reduce, of } from 'rxjs';
-import { take } from 'rxjs';
 
 import { Attribute, CategoryAttributeDTO, AttributeType } from '../../models/attribute.model';
 import { Category, CategoryDTO, CategoryTreeNodeDTO } from '../../models/category.model';

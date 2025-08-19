@@ -1,4 +1,4 @@
-.dashboard {
+/* .dashboard {
   min-height: 100vh;
   padding: 2.5rem;
   background: linear-gradient(135deg, #1d3557, #457b9d);
@@ -28,14 +28,55 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-}
+ .card:hover {
+   transform: translateX(-5px); 
+   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+ }
 
 .card h2 {
   font-size: 1.75rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
   color: #1d3557;
+} */
+
+.dashboard {
+  min-height: 100vh;
+  padding: 1.5rem;
+  background: #f1f5f9; /* خاکستری-آبی خیلی روشن */
+  font-family: 'iran_yekan', sans-serif;
+  color: #1e293b; /* خاکستری-آبی تیره */
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.card {
+  background: #ffffff; /* سفید برای کارت‌ها */
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db; /* حاشیه خاکستری روشن */
+  color: #1e293b;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* سایه بسیار ملایم */
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* سایه کمی قوی‌تر در هاور */
+}
+
+.card h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1e293b;
 }

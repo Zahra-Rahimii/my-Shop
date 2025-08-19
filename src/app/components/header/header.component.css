@@ -1,91 +1,58 @@
-/* Toolbar container styling */
+/* Toolbar container styling
 p-menubar{
     margin-bottom: 3rem;
 }
-p-toolbar {
-  background-color: #ffffff;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
-  border-radius: 3rem !important; /* keep your rounded corners */
-  padding: 1rem 1rem 1rem 1.5rem !important;
-  direction: rtl; /* for right-to-left languages like Persian */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-family: sans-serif;
+
+
+ */
+
+
+ .p-menubar {
+  background: #ffffff !important; /* سفید برای منوبار */
+  border: 1px solid #d1d5db !important; /* حاشیه خاکستری روشن */
+  border-radius: 8px !important;
+  padding: 0.5rem 1rem !important;
+  margin-bottom: 2rem;
+  font-family: 'iran_yekan', sans-serif !important;
+  color: #1e293b !important;
+  direction: rtl;
 }
 
-/* Start section flex container */
-/* p-toolbar >>> ng-template[start] > div.flex {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-} */
-
-/* End section flex container */
-/* p-toolbar >>> ng-template[end] > div.flex {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-} */
-
-/* SVG icon styling */
-p-toolbar svg {
-  width: 2rem !important;
-  height: 2rem !important;
-  margin-left: 1rem; /* since direction is rtl, margin-left pushes icon away */
-  flex-shrink: 0;
-  cursor: pointer;
-  transition: transform 0.3s ease;
+.p-menubar .p-menuitem-link {
+  color: #1e293b !important;
+  border-radius: 6px !important;
+  padding: 0.5rem 0.75rem !important;
+  transition: background 0.2s ease !important;
 }
 
-p-toolbar svg:hover {
-  transform: scale(1.1);
-  fill: var(--p-primary-color);
+.p-menubar .p-menuitem-link:hover {
+  background: #60a5fa !important; /* آبی ملایم برای هاور */
+  color: #ffffff !important;
 }
 
-/* PrimeNG buttons styling */
-p-toolbar p-button {
-  font-weight: 600;
-  color: #333;
-  border-radius: 1.5rem;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  padding: 0.5rem 1rem;
-  min-width: 140px;
+.p heartbreaking-bar .p-menuitem-text {
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
 }
 
-/* Text buttons */
-p-toolbar p-button[text] {
-  color: var(--p-primary-color);
+.p-menubar .p-avatar {
+  border-radius: 50% !important;
+  border: 1px solid #d1d5db !important;
 }
 
-p-toolbar p-button[text]:hover {
-    background-color: transparent;
-    color: var(--p-primary-color);
-    box-shadow: none;
-    text-decoration: underline; 
-  }
-
-/* Contrast button (for account button) */
-p-toolbar p-button[severity="contrast"] {
-    background-color: transparent;
-    color: var(--p-primary-color);
+.p-menubar .p-submenu-list {
+  background: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
 }
 
-p-toolbar p-button[severity="contrast"]:hover {
-  background-color: #004d99;
-  box-shadow: 0 0 12px #004d99;
+.p-menubar .p-submenu-list .p-menuitem-link {
+  color: #1e293b !important;
+  padding: 0.5rem 0.75rem !important;
 }
 
-/* Responsive: stack buttons on small screens */
-@media (max-width: 768px) {
-  p-toolbar >>> ng-template[start] > div.flex,
-  p-toolbar >>> ng-template[end] > div.flex {
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-  
-  p-toolbar p-button {
-    min-width: auto;
-    flex: 1 1 100%;
-  }
+.p-menubar .p-submenu-list .p-menuitem-link:hover {
+  background: #60a5fa !important;
+  color: #ffffff !important;
 }

@@ -1,59 +1,68 @@
 .tree-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  padding: 2rem;
-  background: linear-gradient(135deg, #457b9d, #a8dadc);
-  border-radius: 1rem;
-  border: 1px solid #1d3557;
-  color: #f1faee;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  gap: 1rem; /* کاهش فاصله برای مینیمالیسم */
+  padding: 1.5rem;
+  background: #ffffff; /* سفید برای کانتینر */
+  border-radius: 8px;
+  border: 1px solid #d1d5db; /* حاشیه خاکستری روشن */
+  color: #1e293b; /* خاکستری-آبی تیره */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* سایه ملایم */
   max-width: 600px;
-  margin: 2rem auto;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 1.5rem auto; /* کاهش margin */
+  font-family: 'iran_yekan', sans-serif;
 }
 
-/* استایل نودها */
+/* کارت نودها */
 .p-tree .p-treenode-content {
   display: flex;
   align-items: center;
-  padding: 0.6rem 1rem;
-  margin-bottom: 0.35rem;
-  border-radius: 0.6rem;
-  background: rgba(241, 250, 238, 0.15); /* کمی شفاف */
-  color: #f1faee;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 6px;
+  background: #f8fafc; /* خاکستری-آبی بسیار روشن */
+  color: #1e293b;
   font-weight: 500;
-  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
 /* افکت hover */
 .p-tree .p-treenode-content:hover {
-  background: rgba(241, 250, 238, 0.25);
-  transform: scale(1.02);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  background: #e2e8f0; /* خاکستری-آبی روشن */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* فاصله بین والد و فرزند */
 .p-tree .p-treenode-children {
   margin-left: 1.5rem;
-  border-left: 2px solid rgba(29, 53, 87, 0.4);
-  padding-left: 1rem;
-  transition: margin 0.3s ease;
+  border-left: 2px solid #d1d5db; /* حاشیه خاکستری روشن */
+  padding-left: 0.75rem;
 }
 
-/* فاصله اضافی برای نودهای تو در تو */
-.p-tree .p-treenode-children .p-treenode-children {
-  margin-left: 1rem; 
-}
-
-/* آیکون‌ها (فلش باز و بسته) */
+/* آیکون‌های باز و بسته شدن */
 .p-tree .p-treenode-toggler {
   margin-right: 0.5rem;
-  color: #f1faee;
-  transition: transform 0.2s ease;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  background: #e2e8f0; /* خاکستری-آبی روشن */
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
+/* افکت hover برای toggler */
+.p-tree .p-treenode-toggler:hover {
+  background: #60a5fa; /* آبی ملایم */
+  color: #ffffff;
+}
+
+/* rotate آیکون هنگام باز و بسته شدن */
 .p-tree .p-treenode-toggler.p-treenode-toggler-collapsed {
   transform: rotate(-90deg);
 }
@@ -64,11 +73,57 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 0.95rem;
 }
 
 /* حالت انتخاب شده */
 .p-tree .p-treenode-content.p-highlight {
-  background: rgba(241, 250, 238, 0.4);
-  color: #1d3557;
+  background: #e2e8f0; /* خاکستری-آبی روشن */
+  color: #1e293b;
   font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* کوچک کردن فاصله بین نودهای تو در تو */
+.p-tree .p-treenode-children .p-treenode-children {
+  margin-left: 1rem;
+}
+
+/* استایل دکمه آیکون */
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: #4b5563; /* خاکستری متوسط */
+  padding: 0.25rem;
+  font-size: 1rem;
+  transition: color 0.2s ease;
+}
+
+.icon-btn:hover {
+  color: #60a5fa; /* آبی ملایم در هاور */
+}
+
+.attributes-dialog .p-dialog-content {
+  background: #ffffff; /* سفید برای دیالوگ */
+  color: #1e293b;
+  border-radius: 6px;
+  padding: 1rem;
+  font-family: 'iran_yekan', sans-serif;
+}
+
+.attributes-dialog .p-dialog-content > div > div {
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #d1d5db; /* حاشیه خاکستری روشن */
+}
+
+.attributes-dialog .p-dialog-content > div > div:last-child {
+  border-bottom: none;
+}
+
+.no-attributes {
+  font-size: 0.9rem;
+  color: #4b5563; /* خاکستری متوسط */
+  padding: 0.5rem;
+  text-align: center;
 }

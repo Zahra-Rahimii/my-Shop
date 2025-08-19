@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  // default
   {
     path: '',
     redirectTo: '/home',

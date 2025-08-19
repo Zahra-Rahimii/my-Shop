@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Output, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { take, debounceTime } from 'rxjs';
+import { switchMap, expand, reduce, of } from 'rxjs';
 import { TreeModule } from 'primeng/tree';
 import { TreeNode } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
-import { take, debounceTime } from 'rxjs';
-import { switchMap, expand, reduce, of } from 'rxjs';
 
 import { CategoryService } from '../../services/category.service';
 import { AttributeService } from '../../services/attribute.service';
@@ -40,8 +40,8 @@ export class CategoryTreeComponent {
       next: (cats) => {
         console.log('دسته‌بندی‌های دریافتی:', JSON.stringify(cats, null, 2));
         this.categories.set(this.mapCategoriesToTreeNodes(cats));
-        this.messageService.clear();
-        this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'دسته‌بندی‌ها با موفقیت لود شدند', life: 3000 });
+        // this.messageService.clear();
+        // this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'دسته‌بندی‌ها با موفقیت لود شدند', life: 3000 });
       },
       error: () => {
         // خطا توسط BaseService با p-toast مدیریت می‌شه
@@ -117,13 +117,13 @@ showAttributesDialog(node: TreeNode) {
     .then(attributes => {
       node.data.attributes = attributes;
       this.showDialog.set(true);
-      this.messageService.clear();
-      this.messageService.add({
-        severity: 'success',
-        summary: 'موفق',
-        detail: 'ویژگی‌ها با موفقیت لود شدند',
-        life: 3000
-      });
+      // this.messageService.clear();
+      // this.messageService.add({
+      //   severity: 'success',
+      //   summary: 'موفق',
+      //   detail: 'ویژگی‌ها با موفقیت لود شدند',
+      //   life: 3000
+      // });
       this.isLoadingAttributes = false;
     })
     .catch(() => {

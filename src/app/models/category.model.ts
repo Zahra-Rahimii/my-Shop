@@ -1,5 +1,10 @@
 import { CategoryAttributeDTO } from './attribute.model';
 
+export enum ProductCondition {
+  NEW = 'NEW',
+  USED = 'USED',
+}
+
 export interface Category {
   id: number;
   name: string;
@@ -12,6 +17,7 @@ export interface CategoryDTO {
   name: string;
   description?: string;
   parentId?: number | null;
+  condition?: ProductCondition;
 }
 
 export interface CategoryTreeNodeDTO {
