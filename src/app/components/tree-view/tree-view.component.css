@@ -1,0 +1,74 @@
+.tree-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #457b9d, #a8dadc);
+  border-radius: 1rem;
+  border: 1px solid #1d3557;
+  color: #f1faee;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+  margin: 2rem auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* استایل نودها */
+.p-tree .p-treenode-content {
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  margin-bottom: 0.35rem;
+  border-radius: 0.6rem;
+  background: rgba(241, 250, 238, 0.15); /* کمی شفاف */
+  color: #f1faee;
+  font-weight: 500;
+  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+/* افکت hover */
+.p-tree .p-treenode-content:hover {
+  background: rgba(241, 250, 238, 0.25);
+  transform: scale(1.02);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* فاصله بین والد و فرزند */
+.p-tree .p-treenode-children {
+  margin-left: 1.5rem;
+  border-left: 2px solid rgba(29, 53, 87, 0.4);
+  padding-left: 1rem;
+  transition: margin 0.3s ease;
+}
+
+/* فاصله اضافی برای نودهای تو در تو */
+.p-tree .p-treenode-children .p-treenode-children {
+  margin-left: 1rem; 
+}
+
+/* آیکون‌ها (فلش باز و بسته) */
+.p-tree .p-treenode-toggler {
+  margin-right: 0.5rem;
+  color: #f1faee;
+  transition: transform 0.2s ease;
+}
+
+.p-tree .p-treenode-toggler.p-treenode-toggler-collapsed {
+  transform: rotate(-90deg);
+}
+
+/* متن نودها */
+.p-tree .p-treenode-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* حالت انتخاب شده */
+.p-tree .p-treenode-content.p-highlight {
+  background: rgba(241, 250, 238, 0.4);
+  color: #1d3557;
+  font-weight: 600;
+}

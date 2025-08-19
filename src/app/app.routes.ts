@@ -1,17 +1,18 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
+  // default
   {
     path: '',
-    redirectTo: '/admin',
+    redirectTo: '/home',
     pathMatch: 'full',
   },
-  // {
-  //   path: 'home',
-  //   loadComponent: () =>
-  //     import('./components/home/home.component')
-  //       .then(c => c.HomeComponent),
-  // },
+  {
+    path: 'home',
+    loadComponent: () =>
+      import('./components/home/home.component')
+        .then(c => c.HomeComponent),
+  },
   {
     path: 'admin',
     loadComponent: () =>
@@ -25,11 +26,23 @@ export const routes: Routes = [
         .then(c => c.CategoryFormComponent),
   },
   {
+  path: 'category-management',
+  loadComponent: () =>
+    import('./components/category-management/category-management.component')
+      .then(c => c.CategoryManagementComponent),
+  },
+  {
     path: 'categories',
     loadComponent: () =>
     import('./components/category-tree/category-tree.component')
         .then(c => c.CategoryTreeComponent),
   },
+  {
+  path: 'tree-view',
+  loadComponent: () =>
+    import('./components/tree-view/tree-view.component')
+      .then(c => c.TreeViewComponent),
+},
   {
     path: 'add-product',
     loadComponent: () =>
