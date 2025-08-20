@@ -1,85 +1,74 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToolbarModule } from 'primeng/toolbar';
-import { ButtonModule } from "primeng/button";
+import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
-import { MenuItem } from 'primeng/api';
 import { MenubarModule } from 'primeng/menubar';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-header',
-  imports: [ToolbarModule, ButtonModule, AvatarModule,ToolbarModule, MenubarModule],
+  standalone: true,
+  imports: [ToolbarModule, ButtonModule, AvatarModule, MenubarModule],
   templateUrl: './header.component.html',
-  styleUrl: './header.component.css'
+  styleUrls: ['./header.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HeaderComponent {
-  items: MenuItem[];
+  items: MenuItem[] = [
+    {
+      label: 'خانه',
+      icon: 'pi pi-home',
+      ariaLabel: 'ناوبری به صفحه خانه',
+      command: () => this.navigateTo('home')
+    },
+    {
+      label: 'دسته‌بندی‌ها',
+      icon: 'pi pi-list',
+      ariaLabel: 'منوی دسته‌بندی‌ها',
+      items: [
+        {
+          label: 'افزودن دسته‌بندی جدید',
+          icon: 'pi pi-plus',
+          ariaLabel: 'ناوبری به افزودن دسته‌بندی جدید',
+          command: () => this.navigateTo('category-management')
+        },
+        {
+          label: 'مشاهده دسته‌بندی‌ها',
+          ariaLabel: 'ناوبری به مشاهده دسته‌بندی‌ها',
+          command: () => this.navigateTo('tree-view')
+        }
+      ]
+    },
+    {
+      label: 'محصولات',
+      icon: 'pi pi-tags',
+      ariaLabel: 'منوی محصولات',
+      items: [
+        {
+          label: 'افزودن محصولات',
+          icon: 'pi pi-plus',
+          ariaLabel: 'ناوبری به افزودن محصولات',
+          command: () => this.navigateTo('add-product')
+        },
+        {
+          label: 'لیست محصولات',
+          ariaLabel: 'ناوبری به لیست محصولات',
+          command: () => this.navigateTo('product-list')
+        }
+      ]
+    },
+    {
+      label: 'حساب کاربری',
+      icon: 'pi pi-user',
+      ariaLabel: 'ناوبری به حساب کاربری',
+      command: () => this.navigateTo('admin')
+    }
+  ];
+
+  constructor(private router: Router) {}
+
   navigateTo(route: string) {
     this.router.navigate([route]);
   }
-  constructor(private router: Router) {
-    this.items = [
-      {
-        label: 'خانه',
-        icon: 'pi pi-home',
-        command: () => this.navigateTo('home')
-      },
-      {
-        label: 'دسته‌بندی‌ها',
-        icon: 'pi pi-list',
-        items: [
-          {
-            label: 'افزودن دسته‌بندی جدید',
-            icon: 'pi pi-plus',
-            command: () => this.navigateTo('category-management')
-          },
-          {
-            label: 'مشاهده دسته‌بندی‌ها',
-            command: () => this.navigateTo('tree-view')
-          }
-        ]
-      },
-      {
-        label: 'محصولات',
-        icon: 'pi pi-tags',
-        items: [
-          {
-            label: 'افزودن محصولات',
-            icon: 'pi pi-plus',
-            command: () => this.navigateTo('add-product')
-          },
-          {
-            label: 'لیست محصولات',
-            command: () => this.navigateTo('product-list')
-          }
-        ]
-      },
-      {
-        label: 'حساب کاربری',
-        icon: 'pi pi-user',
-        command: () => this.navigateTo('admin')
-      }
-    ];
-  }
-
-  }
-
-
-
- 
- // public isLoggedIn() {
-  //   return this.userAuthService.isLoggedIn();
-  // }
-
-  // public logout() {
-  //   this.userAuthService.clear();
-  //   this.router.navigate(['/']);
-  // }
-
-  // public isAdmin(){
-  //   return this.userAuthService.isAdmin();
-  // }
-
-  // public isUser(){
-  //   return this.userAuthService.isUser();
-  // }
+}

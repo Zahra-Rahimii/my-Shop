@@ -11,12 +11,12 @@ import { TreeSelectModule } from 'primeng/treeselect';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ChipsModule } from 'primeng/chips';
 import { MessageService } from 'primeng/api';
-import { ProductService } from '../../services/product.service';
-import { CategoryService } from '../../services/category.service';
-import { AttributeService } from '../../services/attribute.service';
-import { ProductDTO } from '../../models/product.model';
-import { CategoryTreeNodeDTO } from '../../models/category.model';
-import { CategoryAttributeDTO, AttributeType } from '../../models/attribute.model';
+import { ProductService } from '../../../services/product.service';
+import { CategoryService } from '../../../services/category.service';
+import { AttributeService } from '../../../services/attribute.service';
+import { ProductDTO } from '../../../models/product.model';
+import { CategoryTreeNodeDTO } from '../../../models/category.model';
+import { CategoryAttributeDTO, AttributeType } from '../../../models/attribute.model';
 
 @Component({
   selector: 'app-product-form',

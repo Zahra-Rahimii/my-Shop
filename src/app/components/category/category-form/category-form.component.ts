@@ -1,18 +1,17 @@
 import { Component, signal, input, output, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { distinctUntilChanged, switchMap, expand, reduce, of } from 'rxjs';
-import { take } from 'rxjs';
+import { take, distinctUntilChanged, switchMap, expand, reduce, of } from 'rxjs';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 
-import { Attribute, CategoryAttributeDTO, AttributeType } from '../../models/attribute.model';
-import { Category, CategoryDTO, CategoryTreeNodeDTO } from '../../models/category.model';
-import { CategoryService } from '../../services/category.service';
-import { AttributeService } from '../../services/attribute.service';
+import { Attribute, CategoryAttributeDTO, AttributeType } from '../../../models/attribute.model';
+import { Category, CategoryDTO, CategoryTreeNodeDTO } from '../../../models/category.model';
+import { CategoryService } from '../../../services/category.service';
+import { AttributeService } from '../../../services/attribute.service';
 
 @Component({
   selector: 'app-category-form',
@@ -53,39 +52,34 @@ export class CategoryFormComponent implements OnInit, OnChanges {
       name: ['', Validators.required],
       description: [''],
       parentId: [null],
-      attributeName: [''],
+      attributeName: ['', Validators.required],
       attributeType: [null],
       required: [false]
     });
   }
 
-
-
-ngOnInit() {
-  this.loadCategories();
-  this.categoryForm.get('parentId')?.valueChanges
-    .pipe(
-      distinctUntilChanged(),
-      switchMap((parentId: number | null) => {
-        if (!parentId) return of([]); // بدون والد → ویژگی خالی
-
-        // بازگشتی با expand
-        return this.categoryService.getCategory(parentId).pipe(
-          expand(category => category.parentId ? this.categoryService.getCategory(category.parentId) : of()),
-          switchMap(category =>
-            this.attributeService.getCategoryAttributes(category.id, false).pipe(
-              switchMap(attrs => of(attrs.map(a => ({ ...a, inherited: true }))))
-            )
-          ),
-          reduce((all, current) => [...all, ...current], [] as CategoryAttributeDTO[])
-        );
-      })
-    )
-    .subscribe(allAttrs => {
-      this.inheritedAttributes.set(allAttrs);
-    });
-}
-
+  ngOnInit() {
+    this.loadCategories();
+    this.categoryForm.get('parentId')?.valueChanges
+      .pipe(
+        distinctUntilChanged(),
+        switchMap((parentId: number | null) => {
+          if (!parentId) return of([]);
+          return this.categoryService.getCategory(parentId).pipe(
+            expand((category: Category) => category.parentId ? this.categoryService.getCategory(category.parentId) : of()),
+            switchMap((category: Category) =>
+              this.attributeService.getCategoryAttributes(category.id, false).pipe(
+                switchMap((attrs: CategoryAttributeDTO[]) => of(attrs.map(a => ({ ...a, inherited: true }))))
+              )
+            ),
+            reduce((all: CategoryAttributeDTO[], current: CategoryAttributeDTO[]) => [...all, ...current], [] as CategoryAttributeDTO[])
+          );
+        })
+      )
+      .subscribe(allAttrs => {
+        this.inheritedAttributes.set(allAttrs);
+      });
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['categoryId'] && this.categoryId() !== null) {
@@ -104,18 +98,16 @@ ngOnInit() {
   private loadCategories() {
     this.categoryService.getCategories().pipe(take(1)).subscribe({
       next: (cats) => {
-        console.log('دسته‌بندی‌های دریافتی:', JSON.stringify(cats, null, 2));
         const flatCategories = this.flattenCategories(cats);
         this.categories.set([
           { label: 'بدون والد', value: null },
           ...flatCategories.map(cat => ({ label: cat.name, value: cat.id }))
         ]);
-        console.log('Flattened categories:', JSON.stringify(flatCategories, null, 2));
         this.messageService.clear();
         this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'دسته‌بندی‌ها با موفقیت لود شدند', life: 3000 });
       },
       error: () => {
-        // خطا توسط BaseService با p-toast مدیریت می‌شه
+        // Handled by BaseService
       }
     });
   }
@@ -133,7 +125,7 @@ ngOnInit() {
         this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'دسته‌بندی با موفقیت لود شد', life: 3000 });
       },
       error: () => {
-        // خطا توسط BaseService با p-toast مدیریت می‌شه
+        // Handled by BaseService
       }
     });
     this.attributeService.getCategoryAttributes(this.categoryId()!, true).pipe(take(1)).subscribe({
@@ -144,45 +136,19 @@ ngOnInit() {
         this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'ویژگی‌های دسته‌بندی با موفقیت لود شدند', life: 3000 });
       },
       error: () => {
-        // خطا توسط BaseService با p-toast مدیریت می‌شه
+        // Handled by BaseService
       }
     });
   }
 
-  private loadInheritedAttributesRecursive(parentId: number | null) {
-  if (!parentId) return;
-
-  this.categoryService.getCategory(parentId).pipe(take(1)).subscribe({
-    next: (parent) => {
-      // ویژگی‌های همین والد
-      this.attributeService.getCategoryAttributes(parent.id, false).pipe(take(1)).subscribe({
-        next: (attrs) => {
-          this.inheritedAttributes.update(current => [
-            ...current,
-            ...attrs.map(attr => ({ ...attr, inherited: true }))
-          ]);
-
-          // برو سراغ والد بزرگتر
-          if (parent.parentId) {
-            this.loadInheritedAttributesRecursive(parent.parentId);
-          }
-        },
-        error: () => { /* خطا مدیریت میشه */ }
-      });
-    },
-    error: () => { /* خطا مدیریت میشه */ }
-  });
-}
   private flattenCategories(nodes: CategoryTreeNodeDTO[]): Category[] {
     const currentCategoryId = this.categoryId();
     const result: Category[] = [];
     
     for (const node of nodes) {
       if (!node.data || !node.data.id) {
-        console.warn('Category node with missing data or ID:', node);
         continue;
       }
-      // حذف دسته فعلی و زیرمجموعه‌ها در حالت ویرایش
       if (currentCategoryId && (node.data.id === currentCategoryId || this.isDescendant(node, currentCategoryId))) {
         continue;
       }
@@ -190,17 +156,15 @@ ngOnInit() {
         id: node.data.id,
         name: node.label || 'بدون نام',
         description: node.data.description || '',
-        parentId: node.data.parentId || null, // استفاده از parentId از داده‌های خام
+        parentId: node.data.parentId || null,
         children: []
       };
-      console.log('Category added to flat list:', category);
       result.push(category);
       if (node.children && node.children.length > 0) {
         result.push(...this.flattenCategories(node.children));
       }
     }
     
-    console.log('Flattened categories:', JSON.stringify(result, null, 2));
     return result;
   }
 
@@ -213,11 +177,20 @@ ngOnInit() {
     const attributeName = this.categoryForm.get('attributeName')?.value?.trim();
     const attributeType = this.categoryForm.get('attributeType')?.value;
     const required = this.categoryForm.get('required')?.value;
+
     if (!attributeName || !attributeType) {
       this.messageService.clear();
       this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'نام و نوع ویژگی اجباری است', life: 3000 });
       return;
     }
+
+    const existingAttribute = this.categoryAttributes().find(attr => attr.attributeName.toLowerCase() === attributeName.toLowerCase());
+    if (existingAttribute) {
+      this.messageService.clear();
+      this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'ویژگی با این نام قبلاً اضافه شده است', life: 3000 });
+      return;
+    }
+
     const newAttribute: Attribute = {
       id: 0,
       name: attributeName,
@@ -241,7 +214,7 @@ ngOnInit() {
         this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'ویژگی با موفقیت اضافه شد', life: 3000 });
       },
       error: () => {
-        // خطا توسط BaseService با p-toast مدیریت می‌شه
+        // Handled by BaseService
       }
     });
   }
@@ -256,7 +229,7 @@ ngOnInit() {
           this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'ویژگی با موفقیت حذف شد', life: 3000 });
         },
         error: () => {
-          // خطا توسط BaseService با p-toast مدیریت می‌شه
+          // Handled by BaseService
         }
       });
     } else {
@@ -326,14 +299,14 @@ ngOnInit() {
             );
             this.finalizeSubmission(category);
           }).catch(() => {
-            // خطا توسط BaseService با p-toast مدیریت می‌شه
+            // Handled by BaseService
           });
         } else {
           this.finalizeSubmission(category);
         }
       },
       error: () => {
-        // خطا توسط BaseService با p-toast مدیریت می‌شه
+        // Handled by BaseService
       }
     });
   }
@@ -352,5 +325,9 @@ ngOnInit() {
       detail: `دسته‌بندی "${category.name}" با موفقیت ${this.editMode() ? 'ویرایش' : 'ایجاد'} شد`,
       life: 3000
     });
+  }
+
+  trackByAttribute(index: number, attr: CategoryAttributeDTO): number {
+    return attr.id;
   }
 }

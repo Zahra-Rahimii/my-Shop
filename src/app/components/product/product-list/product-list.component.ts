@@ -4,8 +4,8 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { MessageService } from 'primeng/api';
-import { ProductService } from '../../services/product.service';
-import { Product } from '../../models/product.model';
+import { ProductService } from '../../../services/product.service';
+import { Product } from '../../../models/product.model';
 import { TreeSelectModule } from 'primeng/treeselect';
 
 @Component({
