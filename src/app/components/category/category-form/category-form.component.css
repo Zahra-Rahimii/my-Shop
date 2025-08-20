@@ -154,3 +154,10 @@
   background: #60a5fa;
   color: #ffffff;
 }
+
+.custom-spinner {
+  display: block;
+  margin: 1rem auto;
+  width: 2rem;
+  height: 2rem;
+}
