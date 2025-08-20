@@ -4,7 +4,7 @@ import { take } from 'rxjs';
 import { TreeModule } from 'primeng/tree';
 import { TreeNode } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageService } from 'primeng/api';
 
 import { CategoryService } from '../../../services/category.service';
@@ -15,20 +15,20 @@ import { CategoryAttributeDTO } from '../../../models/attribute.model';
 @Component({
   selector: 'app-category-tree',
   standalone: true,
-  imports: [CommonModule, TreeModule, ButtonModule, DialogModule],
+  imports: [CommonModule, TreeModule, ButtonModule, ProgressSpinnerModule],
   templateUrl: './category-tree.component.html',
   styleUrls: ['./category-tree.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CategoryTreeComponent {
   categories = signal<TreeNode[]>([]);
+  viewMode = signal<'tree' | 'attributes'>('tree');
   @Output() nodeSelected = new EventEmitter<number | null>();
-  showDialog = signal(false);
   selectedNode = signal<TreeNode | null>(null);
   private categoryService = inject(CategoryService);
   private attributeService = inject(AttributeService);
   private messageService = inject(MessageService);
-  private isLoadingAttributes = false;
+  isLoadingAttributes = signal(false);
 
   constructor() {
     this.loadCategories();
@@ -104,30 +104,25 @@ export class CategoryTreeComponent {
   }
 
   showAttributesDialog(node: TreeNode) {
-    if (this.isLoadingAttributes || this.showDialog()) return;
-    if (!node.data?.id) return;
+    if (this.isLoadingAttributes() || !node.data?.id) return;
 
-    this.isLoadingAttributes = true;
+    this.isLoadingAttributes.set(true);
     this.selectedNode.set(node);
 
     this.loadAllInheritedAttributes(node.data.id)
       .then(attributes => {
         node.data.attributes = attributes;
-        this.showDialog.set(true);
-        this.isLoadingAttributes = false;
+        this.viewMode.set('attributes');
+        this.isLoadingAttributes.set(false);
       })
       .catch(() => {
-        this.isLoadingAttributes = false;
+        this.isLoadingAttributes.set(false);
       });
   }
 
-  onDialogShow() {
-    console.log('دیالوگ ویژگی‌ها باز شد');
-  }
-
-  onDialogHide() {
-    this.showDialog.set(false);
-    this.isLoadingAttributes = false;
+  goBack() {
+    this.viewMode.set('tree');
+    this.selectedNode.set(null);
   }
 
   deleteCategory(id: number) {

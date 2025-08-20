@@ -3,8 +3,8 @@ import { TreeNode } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
 import { TreeModule } from 'primeng/tree';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 import { CategoryService } from '../../../services/category.service';
 import { AttributeService } from '../../../services/attribute.service';
@@ -14,7 +14,7 @@ import { CategoryAttributeDTO } from '../../../models/attribute.model';
 @Component({
   selector: 'app-tree-view',
   standalone: true,
-  imports: [CommonModule, TreeModule, ButtonModule, DialogModule],
+  imports: [CommonModule, TreeModule, ButtonModule, ProgressSpinnerModule],
   templateUrl: './tree-view.component.html',
   styleUrls: ['./tree-view.component.css'],
   providers: [MessageService]
@@ -22,11 +22,11 @@ import { CategoryAttributeDTO } from '../../../models/attribute.model';
 export class TreeViewComponent {
   categories = signal<TreeNode[]>([]);
   selectedNode = signal<TreeNode | null>(null);
-  showDialog = signal(false);
+  viewMode = signal<'tree' | 'attributes'>('tree');
+  isLoadingAttributes = signal(false);
   private categoryService = inject(CategoryService);
   private attributeService = inject(AttributeService);
   private messageService = inject(MessageService);
-  private isLoadingAttributes = false;
 
   constructor() {
     this.loadCategories();
@@ -98,17 +98,16 @@ export class TreeViewComponent {
   }
 
   showAttributesDialog(node: TreeNode) {
-    if (this.isLoadingAttributes || this.showDialog()) return;
-    if (!node.data?.id) return;
+    if (this.isLoadingAttributes() || !node.data?.id) return;
 
-    this.isLoadingAttributes = true;
+    this.isLoadingAttributes.set(true);
     this.selectedNode.set(node);
 
     this.loadAllInheritedAttributes(node.data.id)
       .then(attrs => {
         node.data.attributes = attrs;
-        this.showDialog.set(true);
-        this.isLoadingAttributes = false;
+        this.viewMode.set('attributes');
+        this.isLoadingAttributes.set(false);
         this.messageService.clear();
         this.messageService.add({
           severity: 'success',
@@ -118,7 +117,7 @@ export class TreeViewComponent {
         });
       })
       .catch(() => {
-        this.isLoadingAttributes = false;
+        this.isLoadingAttributes.set(false);
         this.messageService.clear();
         this.messageService.add({
           severity: 'error',
@@ -127,6 +126,11 @@ export class TreeViewComponent {
           life: 3000
         });
       });
+  }
+
+  goBack() {
+    this.viewMode.set('tree');
+    this.selectedNode.set(null);
   }
 
   trackByAttribute(index: number, attr: CategoryAttributeDTO) {

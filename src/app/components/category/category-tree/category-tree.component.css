@@ -1,8 +1,14 @@
+.container {
+  padding: 1rem;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 .tree-container {
   background: #ffffff;
   padding: 1rem;
   border-radius: 8px;
-  border: 1px solid #9ca3af; 
+  border: 1px solid #9ca3af;
   color: #1e293b;
 }
 
@@ -43,50 +49,114 @@
   outline-offset: 2px;
 }
 
-.icon-btn {
-  font-size: 1rem;
-  padding: 0.25rem;
-  background: transparent;
-  border: none;
-  color: #4b5563;
-  transition: color 0.2s ease;
-}
-
-.icon-btn:hover,
-.icon-btn:focus {
-  color: #60a5fa;
-  outline: 2px solid #60a5fa; 
-  outline-offset: 2px;
-}
-
-.attributes-dialog .p-dialog-content {
+.attributes-container {
   background: #ffffff;
-  color: #1e293b;
-  border-radius: 6px;
   padding: 1rem;
-  animation: fadeIn 0.3s ease-in;
+  border-radius: 8px;
+  border: 1px solid #9ca3af;
+  color: #1e293b;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   font-family: 'iran_yekan', sans-serif;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.back-btn {
+  padding: 0.5rem;
+  background: #60a5fa;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+}
+
+.back-btn:hover {
+  background: #3b82f6;
 }
 
 .attribute-item {
   font-size: 0.9rem;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #9ca3af; 
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #9ca3af;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .attribute-item:last-child {
   border-bottom: none;
 }
 
+.inherited,
+.required {
+  font-size: 0.8rem;
+  color: #4b5563;
+}
+
 .no-attributes {
   font-size: 0.9rem;
   color: #4b5563;
-  padding: 0.5rem;
+  padding: 1rem;
   text-align: center;
   font-family: 'iran_yekan', sans-serif;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .tree-container,
+  .attributes-container {
+    padding: 0.5rem;
+  }
+
+  .node-content {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .node-label {
+    font-size: 0.85rem;
+  }
+
+  .node-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .show-attributes-btn,
+  .edit-btn,
+  .delete-btn {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .attributes-container {
+    padding: 1rem 0.5rem;
+  }
+
+  .header {
+    flex-direction: row-reverse;
+    justify-content: space-between;
+  }
+
+  .header h2 {
+    font-size: 1.2rem;
+  }
+
+  .attribute-item {
+    font-size: 0.85rem;
+    padding: 0.5rem 0;
+  }
 }

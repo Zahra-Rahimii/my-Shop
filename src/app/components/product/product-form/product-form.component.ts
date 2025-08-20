@@ -464,7 +464,6 @@ export class ProductFormComponent implements OnInit, OnChanges {
       stock: Number(this.productForm.get('stock')?.value) || 0,
       categoryId: Number(this.productForm.get('categoryId')?.value),
       attributeValues: attributes,
-      // condition: 'new',
       condition: ProductCondition.NEW,
       id: 0
     };
