@@ -6,6 +6,7 @@ import { TreeNode } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageService } from 'primeng/api';
+import { Router } from '@angular/router';
 
 import { CategoryService } from '../../../services/category.service';
 import { AttributeService } from '../../../services/attribute.service';
@@ -22,12 +23,11 @@ import { CategoryAttributeDTO } from '../../../models/attribute.model';
 })
 export class CategoryTreeComponent {
   categories = signal<TreeNode[]>([]);
-  viewMode = signal<'tree' | 'attributes'>('tree');
   @Output() nodeSelected = new EventEmitter<number | null>();
-  selectedNode = signal<TreeNode | null>(null);
   private categoryService = inject(CategoryService);
   private attributeService = inject(AttributeService);
   private messageService = inject(MessageService);
+  private router = inject(Router);
   isLoadingAttributes = signal(false);
 
   constructor() {
@@ -107,22 +107,20 @@ export class CategoryTreeComponent {
     if (this.isLoadingAttributes() || !node.data?.id) return;
 
     this.isLoadingAttributes.set(true);
-    this.selectedNode.set(node);
 
     this.loadAllInheritedAttributes(node.data.id)
       .then(attributes => {
         node.data.attributes = attributes;
-        this.viewMode.set('attributes');
+        this.router.navigate([`/category/${node.data.id}/attributes`], {
+          state: { node }
+        });
         this.isLoadingAttributes.set(false);
+        this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'ویژگی‌ها با موفقیت لود شدند', life: 3000 });
       })
       .catch(() => {
         this.isLoadingAttributes.set(false);
+        this.messageService.add({ severity: 'error', summary: 'خطا', detail: 'لود ویژگی‌ها انجام نشد', life: 3000 });
       });
-  }
-
-  goBack() {
-    this.viewMode.set('tree');
-    this.selectedNode.set(null);
   }
 
   deleteCategory(id: number) {

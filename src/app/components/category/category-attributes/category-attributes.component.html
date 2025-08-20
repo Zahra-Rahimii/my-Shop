@@ -1,19 +1,27 @@
 <div class="attributes-container">
-      <h2>ویژگی‌های {{ node?.label }}</h2>
-      <button (click)="goBack()" class="back-btn">بازگشت</button>
-      @if (node?.data.attributes?.length) {
-        @for (attr of node?.data.attributes; track attr.id) {
-          <div class="attribute-item">
-            {{ attr.attributeName }} ({{ attr.attributeType }})
-            @if (attr.inherited) {
-              <span>(ارث‌بری‌شده)</span>
-            }
-            @if (attr.required) {
-              <span>(اجباری)</span>
-            }
-          </div>
-        }
-      } @else {
-        <div class="no-attributes">هیچ ویژگی‌ای وجود ندارد</div>
+  <div class="header">
+    <button (click)="goBack()" class="back-btn" aria-label="بازگشت به درخت دسته‌بندی">
+      <i class="pi pi-arrow-right"></i>
+    </button>
+    <h2>ویژگی‌های {{ node()?.label || 'دسته‌بندی' }}</h2>
+  </div>
+  @if (isLoading()) {
+    <p-progressSpinner aria-label="در حال بارگذاری ویژگی‌ها"></p-progressSpinner>
+  } @else {
+    @if (node()?.data.attributes?.length) {
+      @for (attr of node()?.data.attributes; track trackByAttribute($index, attr)) {
+        <div class="attribute-item">
+          {{ attr.attributeName }} ({{ attr.attributeType }})
+          @if (attr.inherited) {
+            <span class="inherited"> (ارث‌بری‌شده) </span>
+          }
+          @if (attr.required) {
+            <span class="required"> (اجباری) </span>
+          }
+        </div>
       }
-    </div>
+    } @else {
+      <div class="no-attributes">هیچ ویژگی‌ای وجود ندارد</div>
+    }
+  }
+</div>
