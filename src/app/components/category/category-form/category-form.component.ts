@@ -86,28 +86,7 @@ export class CategoryFormComponent implements OnInit, OnChanges {
         });
       });
   }
-  // ngOnInit() {
-  //   this.loadCategories();
-  //   this.categoryForm.get('parentId')?.valueChanges
-  //     .pipe(
-  //       distinctUntilChanged(),
-  //       switchMap((parentId: number | null) => {
-  //         if (!parentId) return of([]);
-  //         return this.categoryService.getCategory(parentId).pipe(
-  //           expand((category: Category) => category.parentId ? this.categoryService.getCategory(category.parentId) : of()),
-  //           switchMap((category: Category) =>
-  //             this.attributeService.getCategoryAttributes(category.id, false).pipe(
-  //               switchMap((attrs: CategoryAttributeDTO[]) => of(attrs.map(a => ({ ...a, inherited: true }))))
-  //             )
-  //           ),
-  //           reduce((all: CategoryAttributeDTO[], current: CategoryAttributeDTO[]) => [...all, ...current], [] as CategoryAttributeDTO[])
-  //         );
-  //       })
-  //     )
-  //     .subscribe(allAttrs => {
-  //       this.inheritedAttributes.set(allAttrs);
-  //     });
-  // }
+  
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['categoryId'] && this.categoryId() !== null) {
@@ -177,7 +156,6 @@ export class CategoryFormComponent implements OnInit, OnChanges {
         });
         this.messageService.clear();
         this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'دسته‌بندی با موفقیت لود شد', life: 3000 });
-        // بارگذاری ویژگی‌های ارث‌بری‌شده
         this.loadInheritedAttributes(category.parentId ?? null).then(attrs => {
           this.inheritedAttributes.set(attrs);
           this.isLoadingAttributes.set(false);
@@ -191,7 +169,6 @@ export class CategoryFormComponent implements OnInit, OnChanges {
             life: 3000
           });
         });
-        // بارگذاری ویژگی‌های مستقیم
         this.attributeService.getCategoryAttributes(this.categoryId()!, true).pipe(take(1)).subscribe({
           next: (attrs) => {
             this.categoryAttributes.set(attrs.filter(attr => !attr.inherited));
@@ -212,34 +189,6 @@ export class CategoryFormComponent implements OnInit, OnChanges {
       }
     });
   }
-  // private loadFormData() {
-  //   if (!this.categoryId()) return;
-  //   this.categoryService.getCategory(this.categoryId()!).pipe(take(1)).subscribe({
-  //     next: (category) => {
-  //       this.categoryForm.patchValue({
-  //         name: category.name,
-  //         description: category.description || '',
-  //         parentId: category.parentId || null
-  //       });
-  //       this.messageService.clear();
-  //       this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'دسته‌بندی با موفقیت لود شد', life: 3000 });
-  //     },
-  //     error: () => {
-  //       // Handled by BaseService
-  //     }
-  //   });
-  //   this.attributeService.getCategoryAttributes(this.categoryId()!, true).pipe(take(1)).subscribe({
-  //     next: (attrs) => {
-  //       this.categoryAttributes.set(attrs.filter(attr => !attr.inherited));
-  //       this.inheritedAttributes.set(attrs.filter(attr => attr.inherited));
-  //       this.messageService.clear();
-  //       this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'ویژگی‌های دسته‌بندی با موفقیت لود شدند', life: 3000 });
-  //     },
-  //     error: () => {
-  //       // Handled by BaseService
-  //     }
-  //   });
-  // }
 
   private flattenCategories(nodes: CategoryTreeNodeDTO[]): Category[] {
     const currentCategoryId = this.categoryId();
@@ -278,7 +227,6 @@ export class CategoryFormComponent implements OnInit, OnChanges {
     const attributeType = this.categoryForm.get('attributeType')?.value;
     const required = this.categoryForm.get('required')?.value;
 
-    // اعتبارسنجی برای اضافه کردن ویژگی
     if (!attributeName || !attributeType) {
       this.messageService.clear();
       this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'نام و نوع ویژگی اجباری است', life: 3000 });
@@ -319,51 +267,6 @@ export class CategoryFormComponent implements OnInit, OnChanges {
       }
     });
   }
-  // addAttribute() {
-  //   const attributeName = this.categoryForm.get('attributeName')?.value?.trim();
-  //   const attributeType = this.categoryForm.get('attributeType')?.value;
-  //   const required = this.categoryForm.get('required')?.value;
-
-  //   if (!attributeName || !attributeType) {
-  //     this.messageService.clear();
-  //     this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'نام و نوع ویژگی اجباری است', life: 3000 });
-  //     return;
-  //   }
-
-  //   const existingAttribute = this.categoryAttributes().find(attr => attr.attributeName.toLowerCase() === attributeName.toLowerCase());
-  //   if (existingAttribute) {
-  //     this.messageService.clear();
-  //     this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'ویژگی با این نام قبلاً اضافه شده است', life: 3000 });
-  //     return;
-  //   }
-
-  //   const newAttribute: Attribute = {
-  //     id: 0,
-  //     name: attributeName,
-  //     type: attributeType
-  //   };
-  //   this.attributeService.addAttribute(newAttribute).pipe(take(1)).subscribe({
-  //     next: (addedAttribute) => {
-  //       const newCatAttr: CategoryAttributeDTO = {
-  //         id: 0,
-  //         categoryId: this.categoryId() || 0,
-  //         attributeId: addedAttribute.id,
-  //         attributeName: addedAttribute.name,
-  //         attributeType: addedAttribute.type,
-  //         required: required,
-  //         categoryName: this.categoryForm.get('name')?.value || '',
-  //         inherited: false
-  //       };
-  //       this.categoryAttributes.update(attrs => [...attrs, newCatAttr]);
-  //       this.categoryForm.patchValue({ attributeName: '', attributeType: null, required: false });
-  //       this.messageService.clear();
-  //       this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'ویژگی با موفقیت اضافه شد', life: 3000 });
-  //     },
-  //     error: () => {
-  //       // Handled by BaseService
-  //     }
-  //   });
-  // }
 
   removeAttribute(index: number) {
     const attr = this.categoryAttributes()[index];
@@ -384,202 +287,14 @@ export class CategoryFormComponent implements OnInit, OnChanges {
       this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'ویژگی با موفقیت حذف شد', life: 3000 });
     }
   }
-
-  // onSubmit() {
-  //   if (!this.categoryForm.valid) {
-  //     this.messageService.clear();
-  //     this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'لطفاً فرم را کامل و صحیح پر کنید', life: 3000 });
-  //     return;
-  //   }
-
-  //   const attributeName = this.categoryForm.get('attributeName')?.value?.trim();
-  //   const attributeType = this.categoryForm.get('attributeType')?.value;
-  //   if (attributeName || attributeType) {
-  //     this.messageService.clear();
-  //     this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'ویژگی جدید وارد شده اما اضافه نشده است. لطفاً ابتدا ویژگی را اضافه کنید.', life: 3000 });
-  //     return;
-  //   }
-
-  //   const categoryDTO: CategoryDTO = {
-  //     name: this.categoryForm.get('name')?.value,
-  //     description: this.categoryForm.get('description')?.value || '',
-  //     parentId: this.categoryForm.get('parentId')?.value || null
-  //   };
-
-  //   const categoryRequest = this.editMode()
-  //     ? this.categoryService.updateCategory(this.categoryId()!, categoryDTO)
-  //     : this.categoryService.addCategory(categoryDTO);
-
-  //   categoryRequest.pipe(take(1)).subscribe({
-  //     next: (category) => {
-  //       const categoryId = category.id;
-  //       if (!categoryId) {
-  //         this.messageService.clear();
-  //         this.messageService.add({ severity: 'error', summary: 'خطا', detail: 'شناسه دسته‌بندی معتبر نیست.', life: 3000 });
-  //         return;
-  //       }
-
-  //       const attributeRequests = this.categoryAttributes()
-  //         .filter(attr => !attr.id)
-  //         .map(attr => {
-  //           const categoryAttributeDTO: CategoryAttributeDTO = {
-  //             id: 0,
-  //             categoryId,
-  //             attributeId: attr.attributeId,
-  //             attributeName: attr.attributeName,
-  //             attributeType: attr.attributeType,
-  //             required: attr.required,
-  //             categoryName: category.name,
-  //             inherited: false
-  //           };
-  //           return this.attributeService.addCategoryAttribute(categoryAttributeDTO);
-  //         });
-
-  //       if (attributeRequests.length > 0) {
-  //         Promise.all(attributeRequests.map(req => req.toPromise())).then(newCatAttrs => {
-  //           this.categoryAttributes.update(attrs =>
-  //             attrs.map(attr => {
-  //               const newCatAttr = newCatAttrs.find(nca => nca?.attributeId === attr.attributeId && !attr.id);
-  //               return newCatAttr ? { ...attr, id: newCatAttr.id } : attr;
-  //             })
-  //           );
-  //           this.finalizeSubmission(category);
-  //         }).catch(() => {
-  //           // Handled by BaseService
-  //         });
-  //       } else {
-  //         this.finalizeSubmission(category);
-  //       }
-  //     },
-  //     error: () => {
-  //       // Handled by BaseService
-  //     }
-  //   });
-  // }
-
-  // private finalizeSubmission(category: Category) {
-  //   this.categoryUpdated.emit();
-  //   this.loadCategories();
-  //   this.categoryForm.reset();
-  //   this.categoryAttributes.set([]);
-  //   this.inheritedAttributes.set([]);
-  //   this.editMode.set(false);
-  //   this.messageService.clear();
-  //   this.messageService.add({
-  //     severity: 'success',
-  //     summary: 'موفق',
-  //     detail: `دسته‌بندی "${category.name}" با موفقیت ${this.editMode() ? 'ویرایش' : 'ایجاد'} شد`,
-  //     life: 3000
-  //   });
-  // }
-
-  // trackByAttribute(index: number, attr: CategoryAttributeDTO): number {
-  //   return attr.id;
-  // }
-
-  // onSubmit() {
-  //   if (!this.categoryForm.valid) {
-  //     this.messageService.clear();
-  //     this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'لطفاً فرم را کامل و صحیح پر کنید', life: 3000 });
-  //     return;
-  //   }
-
-  //   const attributeName = this.categoryForm.get('attributeName')?.value?.trim();
-  //   const attributeType = this.categoryForm.get('attributeType')?.value;
-  //   // فقط اگه هر دو فیلد attributeName و attributeType پر باشن، جلوی ثبت گرفته می‌شه
-  //   if (attributeName && attributeType) {
-  //     this.messageService.clear();
-  //     this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'ویژگی جدید وارد شده اما اضافه نشده است. لطفاً ابتدا ویژگی را اضافه کنید.', life: 3000 });
-  //     return;
-  //   }
-
-  //   const categoryDTO: CategoryDTO = {
-  //     name: this.categoryForm.get('name')?.value,
-  //     description: this.categoryForm.get('description')?.value || '',
-  //     parentId: this.categoryForm.get('parentId')?.value || null
-  //   };
-
-  //   const categoryRequest = this.editMode()
-  //     ? this.categoryService.updateCategory(this.categoryId()!, categoryDTO)
-  //     : this.categoryService.addCategory(categoryDTO);
-
-  //   categoryRequest.pipe(take(1)).subscribe({
-  //     next: (category) => {
-  //       const categoryId = category.id;
-  //       if (!categoryId) {
-  //         this.messageService.clear();
-  //         this.messageService.add({ severity: 'error', summary: 'خطا', detail: 'شناسه دسته‌بندی معتبر نیست.', life: 3000 });
-  //         return;
-  //       }
-
-  //       const attributeRequests = this.categoryAttributes()
-  //         .filter(attr => !attr.id)
-  //         .map(attr => {
-  //           const categoryAttributeDTO: CategoryAttributeDTO = {
-  //             id: 0,
-  //             categoryId,
-  //             attributeId: attr.attributeId,
-  //             attributeName: attr.attributeName,
-  //             attributeType: attr.attributeType,
-  //             required: attr.required,
-  //             categoryName: category.name,
-  //             inherited: false
-  //           };
-  //           return this.attributeService.addCategoryAttribute(categoryAttributeDTO);
-  //         });
-
-  //       if (attributeRequests.length > 0) {
-  //         Promise.all(attributeRequests.map(req => req.toPromise())).then(newCatAttrs => {
-  //           this.categoryAttributes.update(attrs =>
-  //             attrs.map(attr => {
-  //               const newCatAttr = newCatAttrs.find(nca => nca?.attributeId === attr.attributeId && !attr.id);
-  //               return newCatAttr ? { ...attr, id: newCatAttr.id } : attr;
-  //             })
-  //           );
-  //           this.finalizeSubmission(category);
-  //         }).catch(() => {
-  //           // Handled by BaseService
-  //         });
-  //       } else {
-  //         this.finalizeSubmission(category);
-  //       }
-  //     },
-  //     error: () => {
-  //       // Handled by BaseService
-  //     }
-  //   });
-  // }
-
-  // private finalizeSubmission(category: Category) {
-  //   this.categoryUpdated.emit();
-  //   this.loadCategories();
-  //   this.categoryForm.reset();
-  //   this.categoryAttributes.set([]);
-  //   this.inheritedAttributes.set([]);
-  //   this.editMode.set(false);
-  //   this.messageService.clear();
-  //   this.messageService.add({
-  //     severity: 'success',
-  //     summary: 'موفق',
-  //     detail: `دسته‌بندی "${category.name}" با موفقیت ${this.editMode() ? 'ویرایش' : 'ایجاد'} شد`,
-  //     life: 3000
-  //   });
-  // }
-
-  // trackByAttribute(index: number, attr: CategoryAttributeDTO): number {
-  //   return attr.id;
-  // }
-
   
   onSubmit() {
-    // بررسی اعتبارسنجی فیلدهای اصلی دسته
     if (!this.categoryForm.get('name')?.valid) {
       this.messageService.clear();
       this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'نام دسته اجباری است', life: 3000 });
       return;
     }
 
-    // بررسی وجود حداقل یک ویژگی
     if (this.categoryAttributes().length === 0) {
       this.messageService.clear();
       this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'حداقل یک ویژگی باید اضافه شود', life: 3000 });
@@ -661,5 +376,5 @@ export class CategoryFormComponent implements OnInit, OnChanges {
 
   trackByAttribute(index: number, attr: CategoryAttributeDTO): number {
     return attr.id;
-  }
+  } 
 }
