@@ -1,13 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';  
-import { Router } from '@angular/router';
-import { RouterOutlet } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
-
 import { ProductService } from '../../services/product.service';
 import { Product } from '../../models/product.model';
+import { CommonModule } from '@angular/common';  
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
