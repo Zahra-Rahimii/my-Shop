@@ -57,7 +57,7 @@ export class CategoryFormComponent implements OnInit, OnChanges {
       name: ['', Validators.required],
       description: [''],
       parentId: [null],
-      attributeName: ['', Validators.required],
+      attributeName: [''],
       attributeType: [null],
       required: [false]
     });
@@ -278,6 +278,7 @@ export class CategoryFormComponent implements OnInit, OnChanges {
     const attributeType = this.categoryForm.get('attributeType')?.value;
     const required = this.categoryForm.get('required')?.value;
 
+    // اعتبارسنجی برای اضافه کردن ویژگی
     if (!attributeName || !attributeType) {
       this.messageService.clear();
       this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'نام و نوع ویژگی اجباری است', life: 3000 });
@@ -318,6 +319,51 @@ export class CategoryFormComponent implements OnInit, OnChanges {
       }
     });
   }
+  // addAttribute() {
+  //   const attributeName = this.categoryForm.get('attributeName')?.value?.trim();
+  //   const attributeType = this.categoryForm.get('attributeType')?.value;
+  //   const required = this.categoryForm.get('required')?.value;
+
+  //   if (!attributeName || !attributeType) {
+  //     this.messageService.clear();
+  //     this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'نام و نوع ویژگی اجباری است', life: 3000 });
+  //     return;
+  //   }
+
+  //   const existingAttribute = this.categoryAttributes().find(attr => attr.attributeName.toLowerCase() === attributeName.toLowerCase());
+  //   if (existingAttribute) {
+  //     this.messageService.clear();
+  //     this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'ویژگی با این نام قبلاً اضافه شده است', life: 3000 });
+  //     return;
+  //   }
+
+  //   const newAttribute: Attribute = {
+  //     id: 0,
+  //     name: attributeName,
+  //     type: attributeType
+  //   };
+  //   this.attributeService.addAttribute(newAttribute).pipe(take(1)).subscribe({
+  //     next: (addedAttribute) => {
+  //       const newCatAttr: CategoryAttributeDTO = {
+  //         id: 0,
+  //         categoryId: this.categoryId() || 0,
+  //         attributeId: addedAttribute.id,
+  //         attributeName: addedAttribute.name,
+  //         attributeType: addedAttribute.type,
+  //         required: required,
+  //         categoryName: this.categoryForm.get('name')?.value || '',
+  //         inherited: false
+  //       };
+  //       this.categoryAttributes.update(attrs => [...attrs, newCatAttr]);
+  //       this.categoryForm.patchValue({ attributeName: '', attributeType: null, required: false });
+  //       this.messageService.clear();
+  //       this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'ویژگی با موفقیت اضافه شد', life: 3000 });
+  //     },
+  //     error: () => {
+  //       // Handled by BaseService
+  //     }
+  //   });
+  // }
 
   removeAttribute(index: number) {
     const attr = this.categoryAttributes()[index];
@@ -339,18 +385,204 @@ export class CategoryFormComponent implements OnInit, OnChanges {
     }
   }
 
+  // onSubmit() {
+  //   if (!this.categoryForm.valid) {
+  //     this.messageService.clear();
+  //     this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'لطفاً فرم را کامل و صحیح پر کنید', life: 3000 });
+  //     return;
+  //   }
+
+  //   const attributeName = this.categoryForm.get('attributeName')?.value?.trim();
+  //   const attributeType = this.categoryForm.get('attributeType')?.value;
+  //   if (attributeName || attributeType) {
+  //     this.messageService.clear();
+  //     this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'ویژگی جدید وارد شده اما اضافه نشده است. لطفاً ابتدا ویژگی را اضافه کنید.', life: 3000 });
+  //     return;
+  //   }
+
+  //   const categoryDTO: CategoryDTO = {
+  //     name: this.categoryForm.get('name')?.value,
+  //     description: this.categoryForm.get('description')?.value || '',
+  //     parentId: this.categoryForm.get('parentId')?.value || null
+  //   };
+
+  //   const categoryRequest = this.editMode()
+  //     ? this.categoryService.updateCategory(this.categoryId()!, categoryDTO)
+  //     : this.categoryService.addCategory(categoryDTO);
+
+  //   categoryRequest.pipe(take(1)).subscribe({
+  //     next: (category) => {
+  //       const categoryId = category.id;
+  //       if (!categoryId) {
+  //         this.messageService.clear();
+  //         this.messageService.add({ severity: 'error', summary: 'خطا', detail: 'شناسه دسته‌بندی معتبر نیست.', life: 3000 });
+  //         return;
+  //       }
+
+  //       const attributeRequests = this.categoryAttributes()
+  //         .filter(attr => !attr.id)
+  //         .map(attr => {
+  //           const categoryAttributeDTO: CategoryAttributeDTO = {
+  //             id: 0,
+  //             categoryId,
+  //             attributeId: attr.attributeId,
+  //             attributeName: attr.attributeName,
+  //             attributeType: attr.attributeType,
+  //             required: attr.required,
+  //             categoryName: category.name,
+  //             inherited: false
+  //           };
+  //           return this.attributeService.addCategoryAttribute(categoryAttributeDTO);
+  //         });
+
+  //       if (attributeRequests.length > 0) {
+  //         Promise.all(attributeRequests.map(req => req.toPromise())).then(newCatAttrs => {
+  //           this.categoryAttributes.update(attrs =>
+  //             attrs.map(attr => {
+  //               const newCatAttr = newCatAttrs.find(nca => nca?.attributeId === attr.attributeId && !attr.id);
+  //               return newCatAttr ? { ...attr, id: newCatAttr.id } : attr;
+  //             })
+  //           );
+  //           this.finalizeSubmission(category);
+  //         }).catch(() => {
+  //           // Handled by BaseService
+  //         });
+  //       } else {
+  //         this.finalizeSubmission(category);
+  //       }
+  //     },
+  //     error: () => {
+  //       // Handled by BaseService
+  //     }
+  //   });
+  // }
+
+  // private finalizeSubmission(category: Category) {
+  //   this.categoryUpdated.emit();
+  //   this.loadCategories();
+  //   this.categoryForm.reset();
+  //   this.categoryAttributes.set([]);
+  //   this.inheritedAttributes.set([]);
+  //   this.editMode.set(false);
+  //   this.messageService.clear();
+  //   this.messageService.add({
+  //     severity: 'success',
+  //     summary: 'موفق',
+  //     detail: `دسته‌بندی "${category.name}" با موفقیت ${this.editMode() ? 'ویرایش' : 'ایجاد'} شد`,
+  //     life: 3000
+  //   });
+  // }
+
+  // trackByAttribute(index: number, attr: CategoryAttributeDTO): number {
+  //   return attr.id;
+  // }
+
+  // onSubmit() {
+  //   if (!this.categoryForm.valid) {
+  //     this.messageService.clear();
+  //     this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'لطفاً فرم را کامل و صحیح پر کنید', life: 3000 });
+  //     return;
+  //   }
+
+  //   const attributeName = this.categoryForm.get('attributeName')?.value?.trim();
+  //   const attributeType = this.categoryForm.get('attributeType')?.value;
+  //   // فقط اگه هر دو فیلد attributeName و attributeType پر باشن، جلوی ثبت گرفته می‌شه
+  //   if (attributeName && attributeType) {
+  //     this.messageService.clear();
+  //     this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'ویژگی جدید وارد شده اما اضافه نشده است. لطفاً ابتدا ویژگی را اضافه کنید.', life: 3000 });
+  //     return;
+  //   }
+
+  //   const categoryDTO: CategoryDTO = {
+  //     name: this.categoryForm.get('name')?.value,
+  //     description: this.categoryForm.get('description')?.value || '',
+  //     parentId: this.categoryForm.get('parentId')?.value || null
+  //   };
+
+  //   const categoryRequest = this.editMode()
+  //     ? this.categoryService.updateCategory(this.categoryId()!, categoryDTO)
+  //     : this.categoryService.addCategory(categoryDTO);
+
+  //   categoryRequest.pipe(take(1)).subscribe({
+  //     next: (category) => {
+  //       const categoryId = category.id;
+  //       if (!categoryId) {
+  //         this.messageService.clear();
+  //         this.messageService.add({ severity: 'error', summary: 'خطا', detail: 'شناسه دسته‌بندی معتبر نیست.', life: 3000 });
+  //         return;
+  //       }
+
+  //       const attributeRequests = this.categoryAttributes()
+  //         .filter(attr => !attr.id)
+  //         .map(attr => {
+  //           const categoryAttributeDTO: CategoryAttributeDTO = {
+  //             id: 0,
+  //             categoryId,
+  //             attributeId: attr.attributeId,
+  //             attributeName: attr.attributeName,
+  //             attributeType: attr.attributeType,
+  //             required: attr.required,
+  //             categoryName: category.name,
+  //             inherited: false
+  //           };
+  //           return this.attributeService.addCategoryAttribute(categoryAttributeDTO);
+  //         });
+
+  //       if (attributeRequests.length > 0) {
+  //         Promise.all(attributeRequests.map(req => req.toPromise())).then(newCatAttrs => {
+  //           this.categoryAttributes.update(attrs =>
+  //             attrs.map(attr => {
+  //               const newCatAttr = newCatAttrs.find(nca => nca?.attributeId === attr.attributeId && !attr.id);
+  //               return newCatAttr ? { ...attr, id: newCatAttr.id } : attr;
+  //             })
+  //           );
+  //           this.finalizeSubmission(category);
+  //         }).catch(() => {
+  //           // Handled by BaseService
+  //         });
+  //       } else {
+  //         this.finalizeSubmission(category);
+  //       }
+  //     },
+  //     error: () => {
+  //       // Handled by BaseService
+  //     }
+  //   });
+  // }
+
+  // private finalizeSubmission(category: Category) {
+  //   this.categoryUpdated.emit();
+  //   this.loadCategories();
+  //   this.categoryForm.reset();
+  //   this.categoryAttributes.set([]);
+  //   this.inheritedAttributes.set([]);
+  //   this.editMode.set(false);
+  //   this.messageService.clear();
+  //   this.messageService.add({
+  //     severity: 'success',
+  //     summary: 'موفق',
+  //     detail: `دسته‌بندی "${category.name}" با موفقیت ${this.editMode() ? 'ویرایش' : 'ایجاد'} شد`,
+  //     life: 3000
+  //   });
+  // }
+
+  // trackByAttribute(index: number, attr: CategoryAttributeDTO): number {
+  //   return attr.id;
+  // }
+
+  
   onSubmit() {
-    if (!this.categoryForm.valid) {
+    // بررسی اعتبارسنجی فیلدهای اصلی دسته
+    if (!this.categoryForm.get('name')?.valid) {
       this.messageService.clear();
-      this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'لطفاً فرم را کامل و صحیح پر کنید', life: 3000 });
+      this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'نام دسته اجباری است', life: 3000 });
       return;
     }
 
-    const attributeName = this.categoryForm.get('attributeName')?.value?.trim();
-    const attributeType = this.categoryForm.get('attributeType')?.value;
-    if (attributeName || attributeType) {
+    // بررسی وجود حداقل یک ویژگی
+    if (this.categoryAttributes().length === 0) {
       this.messageService.clear();
-      this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'ویژگی جدید وارد شده اما اضافه نشده است. لطفاً ابتدا ویژگی را اضافه کنید.', life: 3000 });
+      this.messageService.add({ severity: 'warn', summary: 'هشدار', detail: 'حداقل یک ویژگی باید اضافه شود', life: 3000 });
       return;
     }
 
