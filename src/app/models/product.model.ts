@@ -19,8 +19,13 @@ export interface ProductDTO {
   price: number;
   stock: number;
   categoryId: number;
-  condition?: ProductCondition;
-  attributeValues: ProductAttributeValueDTO[];
+  categoryName?: string;
+  condition?: string;
+  attributeValues?: any[];
+  media?: { 
+    url: string; 
+    type?: 'image' | 'video';
+  }[];
 }
 
 export interface ProductAttributeValue {

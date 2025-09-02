@@ -80,6 +80,7 @@ import { BaseService } from './base.service';
 import { Product, ProductDTO, ProductAttributeValue, ProductAttributeValueDTO } from '../models/product.model';
 import { CategoryAttributeDTO } from '../models/attribute.model';
 import { AttributeService } from './attribute.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -142,6 +143,10 @@ export class ProductService extends BaseService {
       catchError(this.handleError)
     );
   }
+  //////i just add this for buying
+buyProduct(productId: number) {
+  return this.http.patch(`${environment.apiUrl}/products/${productId}`, { stockChange: -1 });
+}
   searchProducts(term: string): Observable<Product[]> {
     // Encode term to be safe for URLs
     const encodedTerm = encodeURIComponent(term);
