@@ -75,8 +75,8 @@ import { HttpClient } from '@angular/common/http';
     CardModule,
     RadioButtonModule,
   ],
-  templateUrl: './product.component.html',
-  styleUrls: ['./product.component.css'],
+  templateUrl: './product-form.component.html',
+  styleUrls: ['./product-form.component.css'],
 })
 export class ProductFormComponent implements OnInit, OnChanges {
   @Input() productToEdit: ProductDTO | null = null;
