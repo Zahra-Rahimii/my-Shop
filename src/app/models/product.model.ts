@@ -2,6 +2,7 @@ import { AttributeType } from './attribute.model';
 import { ProductCondition } from './category.model';
 
 export interface Product {
+  condition: any;
   id: number;
   title: string;
   description: string;

@@ -1,94 +1,77 @@
-// import { Component, signal, OnInit, inject } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { CardModule } from 'primeng/card';
-// import { ButtonModule } from 'primeng/button';
-// import { TagModule } from 'primeng/tag';
-// import { MessageService } from 'primeng/api';
-// import { ProductService } from '../../../services/product.service';
-// import { Product } from '../../../models/product.model';
-// import { TreeSelectModule } from 'primeng/treeselect';
-
-// @Component({
-//   selector: 'app-product-list',
-//   standalone: true,
-//   imports: [CommonModule, CardModule, ButtonModule, TagModule, TreeSelectModule],
-//   templateUrl: './product-list.component.html',
-//   styleUrls: ['./product-list.component.css'],
-// })
-// export class ProductListComponent implements OnInit {
-//   listings = signal<Product[]>([]);
-//   private productService = inject(ProductService);
-//   private messageService = inject(MessageService);
-
-//   ngOnInit() {
-//     this.loadProducts();
-//   }
-
-//   loadProducts() {
-//     this.productService.getProducts().subscribe({
-//       next: (products) => {
-//         this.listings.set(products);
-//         this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'محصولات با موفقیت لود شدند', life: 3000 });
-//       },
-//       error: () => {
-//         // خطا توسط BaseService مدیریت می‌شود
-//       },
-//     });
-//   }
-
-//   deleteProduct(productId: number, index: number) {
-//     this.productService.deleteProduct(productId).subscribe({
-//       next: () => {
-//         this.listings.update((listings) => listings.filter((_, i) => i !== index));
-//         this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'محصول با موفقیت حذف شد', life: 3000 });
-//       },
-//       error: () => {
-//         // خطا توسط BaseService مدیریت می‌شود
-//       },
-//     });
-//   }
-// }
-
-
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { ProductService } from '../../../services/product.service';
-import { ProductDTO } from '../../../models/product.model';
+import { Component, signal, inject } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { CommonModule } from '@angular/common';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { injectQuery, injectMutation, injectQueryClient } from '@tanstack/angular-query-experimental';
+import { MessageService } from 'primeng/api';
+import { Router } from '@angular/router';
+import { ProductService } from '../../../services/product.service';
+import { ProductDTO } from '../../../models/product.model';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [TableModule, ButtonModule, TagModule, CommonModule],
+  imports: [TableModule, ButtonModule, TagModule, CommonModule, ProgressSpinnerModule],
   templateUrl: './product-list.component.html',
+  styleUrls: ['./product-list.component.css']
 })
-export class ProductListComponent implements OnInit {
+export class ProductListComponent {
   private productService = inject(ProductService);
+  private messageService = inject(MessageService);
+  private router = inject(Router);
+  private queryClient = injectQueryClient();
 
-  // Products signal
   products = signal<ProductDTO[]>([]);
-
-  // Expanded row
   expanded = signal<number | null>(null);
+  productBeingEdited = signal<ProductDTO | null>(null);
 
-  ngOnInit() {
-    this.loadProducts();
-  }
+  productsQuery = injectQuery(() => ({
+    queryKey: ['products'],
+    queryFn: () => this.productService.getProducts(),
+    onSuccess: (data: ProductDTO[]) => {
+      this.products.set(data);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'موفق',
+        detail: 'محصولات با موفقیت لود شدند',
+        life: 3000
+      });
+    },
+    onError: (err: Error) => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'خطا',
+        detail: err.message,
+        life: 3000
+      });
+    }
+  }));
 
-  loadProducts() {
-    this.productService.getProducts().subscribe({
-      next: (data) => this.products.set(data),
-      error: (err) => console.error(err)
-    });
-  }
+  deleteMutation = injectMutation(() => ({
+    mutationFn: (productId: number) => this.productService.deleteProduct(productId),
+    onSuccess: () => {
+      this.queryClient.invalidateQueries({ queryKey: ['products'] });
+      this.messageService.add({
+        severity: 'success',
+        summary: 'موفق',
+        detail: 'محصول با موفقیت حذف شد',
+        life: 3000
+      });
+    },
+    onError: (err: Error) => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'خطا',
+        detail: err.message,
+        life: 3000
+      });
+    }
+  }));
 
   deleteProduct(id: number) {
-    this.productService.deleteProduct(id).subscribe({
-      next: () => this.products.update(list => list.filter(p => p.id !== id)),
-      error: (err) => console.error(err)
-    });
+    this.deleteMutation.mutate(id);
   }
 
   toggleExpanded(id: number) {
@@ -96,13 +79,7 @@ export class ProductListComponent implements OnInit {
   }
 
   editProduct(product: ProductDTO) {
-    // this.productForm.patchValue({
-    //   title: product.title,
-    //   description: product.description,
-    //   price: product.price,
-    //   stock: product.stock,
-    //   condition: product.condition,
-    //   categoryId: product.categoryId
-    // });
-}
+    this.productBeingEdited.set(product);
+    this.router.navigate(['/add-product'], { queryParams: { id: product.id } });
+  }
 }

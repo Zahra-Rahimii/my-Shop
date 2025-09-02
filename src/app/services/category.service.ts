@@ -1,66 +1,49 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { inject, Injectable } from '@angular/core';
 import { BaseService } from './base.service';
-
 import { Category, CategoryDTO, CategoryTreeNodeDTO } from '../models/category.model';
+import { QueryClient } from '@tanstack/angular-query-experimental';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CategoryService extends BaseService {
   private readonly categoriesEndpoint = 'categories';
   private readonly treeEndpoint = 'categories/tree';
+  private readonly queryClient = inject(QueryClient);
 
-  /**
-   * گرفتن درخت دسته‌بندی‌ها
-   */
-  getCategories(): Observable<CategoryTreeNodeDTO[]> {
-    return this.get<CategoryTreeNodeDTO[]>(this.treeEndpoint).pipe(
-      catchError(this.handleError)
-    );
+  getCategories() {
+    return this.getQuery<CategoryTreeNodeDTO[]>(this.treeEndpoint);
   }
 
-  /**
-   * گرفتن یک دسته‌بندی خاص
-   */
-  getCategory(id: number): Observable<Category> {
-    return this.get<Category>(`${this.categoriesEndpoint}/${id}`).pipe(
-      catchError(this.handleError)
-    );
+  getCategory(id: number) {
+    return this.getQuery<Category>(`${this.categoriesEndpoint}/${id}`);
   }
 
-  /**
-   * اضافه کردن دسته‌بندی جدید
-   */
-  addCategory(category: CategoryDTO): Observable<Category> {
-    return this.post<Category>(this.categoriesEndpoint, category).pipe(
-      catchError(this.handleError)
-    );
+  addCategory(category: CategoryDTO) {
+    return this.postMutation<Category>(this.categoriesEndpoint).mutateAsync(category).then(result => {
+      this.queryClient.invalidateQueries({ queryKey: [this.categoriesEndpoint] });
+      this.queryClient.invalidateQueries({ queryKey: [this.treeEndpoint] });
+      return result;
+    });
   }
 
-  /**
-   * بروزرسانی دسته‌بندی
-   */
-  updateCategory(id: number, category: CategoryDTO): Observable<Category> {
-    return this.put<Category>(`${this.categoriesEndpoint}/${id}`, category).pipe(
-      catchError(this.handleError)
-    );
+  updateCategory(id: number, category: CategoryDTO) {
+    return this.putMutation<Category>(`${this.categoriesEndpoint}/${id}`).mutateAsync(category).then(result => {
+      this.queryClient.invalidateQueries({ queryKey: [this.categoriesEndpoint] });
+      this.queryClient.invalidateQueries({ queryKey: [this.treeEndpoint] });
+      return result;
+    });
   }
 
-  /**
-   * حذف دسته‌بندی
-   */
-  deleteCategory(id: number): Observable<void> {
-    return this.delete<void>(`${this.categoriesEndpoint}/${id}`).pipe(
-      catchError(this.handleError)
-    );
+  deleteCategory(id: number) {
+    return this.deleteMutation<void>(`${this.categoriesEndpoint}/${id}`).mutateAsync().then(result => {
+      this.queryClient.invalidateQueries({ queryKey: [this.categoriesEndpoint] });
+      this.queryClient.invalidateQueries({ queryKey: [this.treeEndpoint] });
+      return result;
+    });
   }
 
-  /**شتیبانی از لود تدریجی p-tree */
-  getCategoryChildren(parentId: number): Observable<CategoryTreeNodeDTO[]> {
-    return this.get<CategoryTreeNodeDTO[]>(`${this.categoriesEndpoint}/${parentId}/children`).pipe(
-      catchError(this.handleError)
-    );
+  getCategoryChildren(parentId: number) {
+    return this.getQuery<CategoryTreeNodeDTO[]>(`${this.categoriesEndpoint}/${parentId}/children`);
   }
 }

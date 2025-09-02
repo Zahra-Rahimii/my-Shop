@@ -1,157 +1,72 @@
-// import { Injectable, inject } from '@angular/core';
-// import { Observable } from 'rxjs';
-// import { catchError } from 'rxjs/operators';
-// import { BaseService } from './base.service';
-
-// import { Product, ProductDTO, ProductAttributeValue, ProductAttributeValueDTO } from '../models/product.model';
-// import { CategoryAttributeDTO } from '../models/attribute.model';
-// import { AttributeService } from './attribute.service';
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class ProductService extends BaseService {
-//   private readonly productsEndpoint = 'products';
-//   private readonly productAttributesEndpoint = 'product-attributes';
-//   private readonly attributeService = inject(AttributeService);
-
-//   /**
-//    * گرفتن همه محصولات
-//    */
-//   getProducts(): Observable<Product[]> {
-//     return this.get<Product[]>(this.productsEndpoint).pipe(
-//       catchError(this.handleError)
-//     );
-//   }
-
-//   /**
-//    * اضافه کردن محصول جدید
-//    */
-//   addProduct(product: ProductDTO): Observable<Product> {
-//     return this.post<Product>(this.productsEndpoint, product).pipe(
-//       catchError(this.handleError)
-//     );
-//   }
-
-//   /**
-//    * گرفتن ویژگی‌های یک محصول
-//    */
-//   getProductAttributes(productId: number): Observable<ProductAttributeValue[]> {
-//     return this.get<ProductAttributeValue[]>(`${this.productAttributesEndpoint}?productId=${productId}`).pipe(
-//       catchError(this.handleError)
-//     );
-//   }
-
-//   /**
-//    * اضافه کردن ویژگی به محصول
-//    */
-//   addProductAttribute(productAttribute: ProductAttributeValueDTO): Observable<ProductAttributeValue> {
-//     return this.post<ProductAttributeValue>(this.productAttributesEndpoint, productAttribute).pipe(
-//       catchError(this.handleError)
-//     );
-//   }
-
-//   /**
-//    * گرفتن ویژگی‌های مجاز برای محصول (بر اساس دسته‌بندی و ارث‌بری)
-//    */
-//   getAvailableAttributesForProduct(categoryId: number): Observable<CategoryAttributeDTO[]> {
-//     return this.attributeService.getCategoryAttributes(categoryId).pipe(
-//       catchError(this.handleError)
-//     );
-//   }
-
-//   /**
-//    * حذف محصول
-//    */
-//   deleteProduct(productId: number): Observable<void> {
-//     return this.delete<void>(`${this.productsEndpoint}/${productId}`).pipe(
-//       catchError(this.handleError)
-//     );
-//   }
-// }
-
-
-
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
 import { BaseService } from './base.service';
-
 import { Product, ProductDTO, ProductAttributeValue, ProductAttributeValueDTO } from '../models/product.model';
 import { CategoryAttributeDTO } from '../models/attribute.model';
 import { AttributeService } from './attribute.service';
+import { QueryClient } from '@tanstack/angular-query-experimental';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ProductService extends BaseService {
   private readonly productsEndpoint = 'products';
   private readonly productAttributesEndpoint = 'product-attributes';
   private readonly attributeService = inject(AttributeService);
+  private readonly queryClient = inject(QueryClient);
 
-  /**
-   * گرفتن همه محصولات
-   */
-  getProducts(): Observable<Product[]> {
-    return this.get<Product[]>(this.productsEndpoint).pipe(
-      catchError(this.handleError)
-    );
+  getProducts() {
+    return this.getQuery<Product[]>(this.productsEndpoint);
   }
 
-  /**
-   * اضافه کردن محصول جدید
-   */
-  addProduct(product: ProductDTO | FormData): Observable<Product> {
-    return this.post<Product>(this.productsEndpoint, product).pipe(
-      catchError(this.handleError)
-    );
-  }
-  
-  /**
-   * گرفتن ویژگی‌های یک محصول
-   */
-  getProductAttributes(productId: number): Observable<ProductAttributeValue[]> {
-    return this.get<ProductAttributeValue[]>(`${this.productAttributesEndpoint}?productId=${productId}`).pipe(
-      catchError(this.handleError)
-    );
+  getProduct(id: number) {
+    return this.getQuery<Product>(`${this.productsEndpoint}/${id}`);
   }
 
-  /**
-   * اضافه کردن ویژگی به محصول
-   */
-  addProductAttribute(productAttribute: ProductAttributeValueDTO): Observable<ProductAttributeValue> {
-    return this.post<ProductAttributeValue>(this.productAttributesEndpoint, productAttribute).pipe(
-      catchError(this.handleError)
-    );
+  addProduct(product: ProductDTO | FormData) {
+    return this.postMutation<Product>(this.productsEndpoint).mutateAsync(product).then(result => {
+      this.queryClient.invalidateQueries({ queryKey: [this.productsEndpoint] });
+      return result;
+    });
   }
 
-  /**
-   * گرفتن ویژگی‌های مجاز برای محصول (بر اساس دسته‌بندی و ارث‌بری)
-   */
-  getAvailableAttributesForProduct(categoryId: number): Observable<CategoryAttributeDTO[]> {
-    return this.attributeService.getCategoryAttributes(categoryId).pipe(
-      catchError(this.handleError)
-    );
+  updateProduct(id: number, product: ProductDTO | FormData) {
+    return this.putMutation<Product>(`${this.productsEndpoint}/${id}`).mutateAsync(product).then(result => {
+      this.queryClient.invalidateQueries({ queryKey: [this.productsEndpoint] });
+      return result;
+    });
   }
 
-  /**
-   * حذف محصول
-   */
-  deleteProduct(productId: number): Observable<void> {
-    return this.delete<void>(`${this.productsEndpoint}/${productId}`).pipe(
-      catchError(this.handleError)
-    );
+  getProductAttributes(productId: number) {
+    return this.getQuery<ProductAttributeValue[]>(`${this.productAttributesEndpoint}?productId=${productId}`);
   }
-  searchProducts(term: string): Observable<Product[]> {
-    // Encode term to be safe for URLs
+
+  addProductAttribute(productAttribute: ProductAttributeValueDTO) {
+    return this.postMutation<ProductAttributeValue>(this.productAttributesEndpoint).mutateAsync(productAttribute).then(result => {
+      this.queryClient.invalidateQueries({ queryKey: [this.productAttributesEndpoint] });
+      return result;
+    });
+  }
+
+  getAvailableAttributesForProduct(categoryId: number) {
+    return this.attributeService.getCategoryAttributes(categoryId);
+  }
+
+  deleteProduct(productId: number) {
+    return this.deleteMutation<void>(`${this.productsEndpoint}/${productId}`).mutateAsync().then(result => {
+      this.queryClient.invalidateQueries({ queryKey: [this.productsEndpoint] });
+      return result;
+    });
+  }
+
+  buyProduct(productId: number) {
+    return this.patchMutation<void>(`${this.productsEndpoint}/${productId}`).mutateAsync({ stockChange: -1 }).then(result => {
+      this.queryClient.invalidateQueries({ queryKey: [this.productsEndpoint] });
+      return result;
+    });
+  }
+
+  searchProducts(term: string) {
     const encodedTerm = encodeURIComponent(term);
-    // Example backend endpoint: /products/search?term=...
-    return this.get<Product[]>(`${this.productsEndpoint}/search?term=${encodedTerm}`).pipe(
-      catchError(this.handleError)
-    );
-  }
-  updateProduct(id: number, product: ProductDTO): Observable<ProductDTO> {
-    const url = `${this.apiUrl}/${id}`;
-    return this.http.put<ProductDTO>(url, product);
+    return this.getQuery<Product[]>(`${this.productsEndpoint}/search?term=${encodedTerm}`);
   }
 }

@@ -1,0 +1,5 @@
+{
+  "/categories/tree": "/categories",
+  "/categories/:id/children": "/categories?parentId=:id",
+  "/products/search?term=:term": "/products?title_like=:term"
+}

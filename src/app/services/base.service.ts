@@ -1,60 +1,102 @@
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { MessageService } from 'primeng/api';
-
+import { injectQuery, injectMutation } from '@tanstack/angular-query-experimental';
+import { lastValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { ToastService } from './toast.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BaseService {
   protected readonly apiUrl = environment.apiUrl;
   protected readonly http = inject(HttpClient);
-  private readonly messageService = inject(MessageService);
+  protected readonly toastService = inject(ToastService);
 
-  protected get<T>(endpoint: string): Observable<T> {
-    return this.http.get<T>(`${this.apiUrl}/${endpoint}`).pipe(
-      catchError(this.handleError.bind(this))
-    );
+  protected getQuery<T>(endpoint: string) {
+    return injectQuery(() => ({
+      queryKey: [endpoint],
+      queryFn: () => lastValueFrom(this.http.get<T>(`${this.apiUrl}/${endpoint}`)).then(result => {
+        if (result === undefined) {
+          throw new Error('داده‌ای از API دریافت نشد.');
+        }
+        return result;
+      }),
+      onError: (error: any) => this.handleError(error),
+    }));
   }
 
-  protected post<T>(endpoint: string, data: any): Observable<T> {
-    return this.http.post<T>(`${this.apiUrl}/${endpoint}`, data).pipe(
-      catchError(this.handleError.bind(this))
-    );
+  protected postMutation<T>(endpoint: string) {
+    return injectMutation(() => ({
+      mutationFn: (data: any) => lastValueFrom(this.http.post<T>(`${this.apiUrl}/${endpoint}`, data)).then(result => {
+        if (result === undefined) {
+          throw new Error('داده‌ای از API دریافت نشد.');
+        }
+        return result;
+      }),
+      onError: (error: any) => this.handleError(error),
+    }));
   }
 
-  protected put<T>(endpoint: string, data: any): Observable<T> {
-    return this.http.put<T>(`${this.apiUrl}/${endpoint}`, data).pipe(
-      catchError(this.handleError.bind(this))
-    );
+  protected putMutation<T>(endpoint: string) {
+    return injectMutation(() => ({
+      mutationFn: (data: any) => lastValueFrom(this.http.put<T>(`${this.apiUrl}/${endpoint}`, data)).then(result => {
+        if (result === undefined) {
+          throw new Error('داده‌ای از API دریافت نشد.');
+        }
+        return result;
+      }),
+      onError: (error: any) => this.handleError(error),
+    }));
   }
 
-  protected delete<T>(endpoint: string): Observable<T> {
-    return this.http.delete<T>(`${this.apiUrl}/${endpoint}`).pipe(
-      catchError(this.handleError.bind(this))
-    );
+  protected patchMutation<T>(endpoint: string) {
+    return injectMutation(() => ({
+      mutationFn: (data: any) => lastValueFrom(this.http.patch<T>(`${this.apiUrl}/${endpoint}`, data)).then(result => {
+        if (result === undefined) {
+          throw new Error('داده‌ای از API دریافت نشد.');
+        }
+        return result;
+      }),
+      onError: (error: any) => this.handleError(error),
+    }));
   }
 
-  protected handleError(error: HttpErrorResponse): Observable<never> {
+  protected deleteMutation<T>(endpoint: string) {
+    return injectMutation(() => ({
+      mutationFn: () => lastValueFrom(this.http.delete<T>(`${this.apiUrl}/${endpoint}`)).then(result => {
+        if (result === undefined) {
+          throw new Error('داده‌ای از API دریافت نشد.');
+        }
+        return result;
+      }),
+      onError: (error: any) => this.handleError(error),
+    }));
+  }
+
+  protected handleError(error: HttpErrorResponse): void {
     let errorMessage = 'خطایی رخ داد. لطفاً دوباره تلاش کنید.';
-    if (error.status === 400) {
-      errorMessage = error.error?.message || 'درخواست نامعتبر است.';
-    } else if (error.status === 404) {
-      errorMessage = 'منبع موردنظر یافت نشد.';
-    } else if (error.status === 500) {
-      errorMessage = 'خطای سرور. لطفاً بعداً تلاش کنید.';
+    let errorDetail = error.error?.message || error.message || 'جزئیات خطا در دسترس نیست.';
+
+    if (error.error && typeof error.error === 'object') {
+      errorDetail = error.error.message || JSON.stringify(error.error.errors || error.error) || errorDetail;
     }
 
-    this.messageService.clear(); 
-    this.messageService.add({
-      severity: 'error',
-      summary: 'خطا',
-      detail: errorMessage
-    });
+    if (error.status === 400) {
+      errorMessage = 'درخواست نامعتبر است.';
+      errorDetail = error.error?.errors?.join(', ') || 'لطفاً اطلاعات ورودی را بررسی کنید.';
+    } else if (error.status === 404) {
+      errorMessage = 'منبع یافت نشد.';
+      errorDetail = 'منبع موردنظر در سرور وجود ندارد.';
+    } else if (error.status === 500) {
+      errorMessage = 'خطای سرور.';
+      errorDetail = 'لطفاً بعداً دوباره تلاش کنید.';
+    } else if (error.status === 0) {
+      errorMessage = 'عدم اتصال به سرور.';
+      errorDetail = 'لطفاً اتصال اینترنت خود را بررسی کنید.';
+    }
 
-    return throwError(() => new Error(errorMessage));
+    this.toastService.error(errorMessage, errorDetail);
+    throw new Error(errorMessage);
   }
 }

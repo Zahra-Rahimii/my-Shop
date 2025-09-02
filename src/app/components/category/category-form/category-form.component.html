@@ -1,20 +1,23 @@
+<p-toast key="global" aria-live="assertive"></p-toast>
+
 <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" class="form-container">
   <div class="form-group">
     <label for="name">نام دسته</label>
     <input pInputText id="name" formControlName="name" placeholder="نام دسته" aria-required="true" />
-    @if(categoryForm.get('name')?.touched && categoryForm.get('name')?.invalid) {
-      <span class="error">نام دسته اجباری است</span>
-    }
   </div>
   <div class="form-group">
     <label for="description">توضیحات</label>
     <textarea pInputTextarea id="description" formControlName="description" class="form-textarea"
-      placeholder="توضیحات"></textarea>
+      placeholder="توضیحات (اختیاری)"></textarea>
   </div>
   <div class="form-group">
     <label for="parentId">دسته والد</label>
-    <p-select id="parentId" formControlName="parentId" [options]="categories()" optionLabel="label" optionValue="value"
-      placeholder="انتخاب دسته والد" [showClear]="true" />
+    @if (categoriesQuery.isPending()) {
+      <p-progressSpinner styleClass="custom-spinner" strokeWidth="4" aria-label="در حال بارگذاری دسته‌بندی‌ها"></p-progressSpinner>
+    } @else {
+      <p-select id="parentId" formControlName="parentId" [options]="categoriesQuery.data()" optionLabel="label" optionValue="value"
+        placeholder="انتخاب دسته والد" [showClear]="true" />
+    }
   </div>
   <div class="form-group">
     <label>ویژگی جدید</label>
@@ -25,20 +28,17 @@
       <h4>الزامی</h4>
       <p-checkbox formControlName="required" label="اجباری" binary="true" aria-label="ویژگی اجباری"></p-checkbox>
       <button pButton type="button" label="اضافه کردن ویژگی" class="add-attribute-btn"
-        (click)="addAttribute()"></button>
+        (click)="addAttribute()" aria-label="اضافه کردن ویژگی جدید به دسته‌بندی"></button>
     </div>
-    @if(categoryForm.get('attributeName')?.touched && categoryForm.get('attributeName')?.invalid) {
-      <span class="error">نام ویژگی اجباری است</span>
-    }
   </div>
-  @if(isLoadingAttributes()) {
-    <p-progressSpinner styleClass="custom-spinner" strokeWidth="4"></p-progressSpinner>
+  @if (inheritedAttributesQuery.isPending()) {
+    <p-progressSpinner styleClass="custom-spinner" strokeWidth="4" aria-label="در حال بارگذاری ویژگی‌های ارث‌بری‌شده"></p-progressSpinner>
   }
-  @if(categoryAttributes().length || inheritedAttributes().length) {
+  @if(categoryAttributes().length || inheritedAttributesQuery.data()?.length) {
     <div class="attributes-list">
       <h3>ویژگی‌های دسته</h3>
       <ul>
-        @for(attr of inheritedAttributes(); track trackByAttribute($index, attr)) {
+        @for(attr of inheritedAttributesQuery.data(); track trackByAttribute($index, attr)) {
           <li class="inherited">
             {{ attr.attributeName }} ({{ attr.attributeType }}) (ارث‌بری‌شده) {{ attr.required ? '(اجباری)' : '' }}
           </li>
@@ -54,5 +54,6 @@
     </div>
   }
   <button pButton type="submit" [label]="editMode() ? 'ویرایش دسته' : 'ثبت دسته'" class="submit-btn"
-    [disabled]="categoryForm.invalid || isLoadingAttributes()"></button>
+    [disabled]="categoryForm.invalid || inheritedAttributesQuery.isPending() || addCategoryMutation.isPending()"
+    aria-label="ثبت یا ویرایش دسته‌بندی"></button>
 </form>

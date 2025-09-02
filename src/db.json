@@ -1,0 +1,217 @@
+{
+  "products": [
+    {
+      "id": 76,
+      "title": "آیفون 13",
+      "description": "",
+      "price": 12000000,
+      "stock": 1,
+      "categoryId": 82,
+      "categoryName": "ios",
+      "attributeValues": [
+        {
+          "id": 34,
+          "attributeId": 132,
+          "attributeName": "رنگ",
+          "attributeType": "STRING",
+          "value": "سفید",
+          "productId": null
+        }
+      ]
+    },
+    {
+      "id": 77,
+      "title": "asus1",
+      "description": "",
+      "price": 0,
+      "stock": 0,
+      "categoryId": 84,
+      "categoryName": "asus",
+      "attributeValues": []
+    },
+    {
+      "id": 78,
+      "title": "ss",
+      "description": "",
+      "price": 0,
+      "stock": 0,
+      "categoryId": 85,
+      "categoryName": "test",
+      "attributeValues": []
+    },
+    {
+      "id": 79,
+      "title": "a",
+      "description": "",
+      "price": 0,
+      "stock": 0,
+      "categoryId": 87,
+      "categoryName": "test select",
+      "attributeValues": [
+        {
+          "id": 35,
+          "attributeId": 138,
+          "attributeName": "a",
+          "attributeType": "SELECT",
+          "value": "1",
+          "productId": null
+        }
+      ]
+    },
+    {
+      "id": 80,
+      "title": "a",
+      "description": "",
+      "price": 0,
+      "stock": 0,
+      "categoryId": 87,
+      "condition": "new",
+      "categoryName": "test select",
+      "attributeValues": [
+        {
+          "id": 36,
+          "attributeId": 138,
+          "attributeName": "a",
+          "attributeType": "SELECT",
+          "value": "1",
+          "productId": null
+        }
+      ]
+    },
+    {
+      "id": 81,
+      "title": "iphon 13",
+      "description": "",
+      "price": 1223,
+      "stock": 0,
+      "categoryId": 82,
+      "condition": "used",
+      "categoryName": "ios",
+      "attributeValues": [
+        {
+          "id": 37,
+          "attributeId": 132,
+          "attributeName": "رنگ",
+          "attributeType": "STRING",
+          "value": "سفید",
+          "productId": null
+        }
+      ]
+    },
+    {
+      "id": 0,
+      "title": "test",
+      "description": "202",
+      "price": 1000,
+      "stock": 1,
+      "categoryId": 1,
+      "attributeValues": [],
+      "condition": "new"
+    }
+  ],
+  "categories": [
+    {
+      "key": "1",
+      "label": "Electronics",
+      "data": {
+        "id": 1,
+        "description": "Electronic devices and gadgets",
+        "parentId": null
+      },
+      "children": [
+        {
+          "key": "1-1",
+          "label": "Computers",
+          "data": {
+            "id": 2,
+            "description": "Desktops and laptops",
+            "parentId": 1
+          },
+          "children": [
+            {
+              "key": "1-1-1",
+              "label": "Laptops",
+              "data": {
+                "id": 3,
+                "description": "Portable computers",
+                "parentId": 2
+              },
+              "attributes": [
+                {
+                  "name": "RAM",
+                  "type": "string",
+                  "value": "16GB"
+                },
+                {
+                  "name": "Storage",
+                  "type": "string",
+                  "value": "512GB SSD"
+                }
+              ]
+            },
+            {
+              "key": "1-1-2",
+              "label": "Desktops",
+              "data": {
+                "id": 4,
+                "description": "Stationary computers",
+                "parentId": 2
+              }
+            }
+          ]
+        },
+        {
+          "key": "1-2",
+          "label": "Smartphones",
+          "data": {
+            "id": 5,
+            "description": "Mobile phones",
+            "parentId": 1
+          }
+        }
+      ]
+    },
+    {
+      "key": "2",
+      "label": "Home Appliances",
+      "data": {
+        "id": 6,
+        "description": "Appliances for home use",
+        "parentId": null
+      },
+      "children": [
+        {
+          "key": "2-1",
+          "label": "Refrigerators",
+          "data": {
+            "id": 7,
+
+"description": "Cooling appliances",
+            "parentId": 6
+          }
+        },
+        {
+          "key": "2-2",
+          "label": "Washing Machines",
+          "data": {
+            "id": 8,
+            "description": "Laundry appliances",
+            "parentId": 6
+          }
+        }
+      ]
+    }
+  ],
+  "CategoryAttributeDTO": [
+    {
+      "id": 0,
+      "categoryId": 0,
+      "attributeId": 0,
+      "attributeName": "",
+      "attributeType": "STRING",
+      "required": false,
+      "categoryName": "",
+      "inherited": false
+    }
+  ]
+}

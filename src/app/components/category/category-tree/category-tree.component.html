@@ -1,57 +1,60 @@
+<p-toast key="global" aria-live="assertive"></p-toast>
+
 <div class="container">
   <div class="tree-container">
-    <p-tree
-      [value]="categories()"
-      [lazy]="true"
-      (onNodeExpand)="loadNode($event)"
-      (onNodeSelect)="selectNode($event)"
-      selectionMode="single"
-    >
-      <ng-template let-node pTemplate="default">
-        <div class="node-content" [attr.aria-expanded]="node.expanded ? 'true' : 'false'" role="treeitem">
-          <span class="node-label">
-            @if (node.children && node.children.length) {
-              <i class="pi" [ngClass]="node.expanded ? 'pi-chevron-up' : 'pi-chevron-down'" (click)="toggleNode(node)" aria-label="باز و بسته کردن زیرمجموعه‌ها"></i>
-            }
-            {{ node.label }}
-          </span>
-          <div class="node-actions">
-            <button
-              pButton
-              type="button"
-              icon="pi pi-list"
-              class="show-attributes-btn"
-              (click)="showAttributesDialog(node)"
-              title="نمایش ویژگی‌ها"
-              [disabled]="!node.data?.id || isLoadingAttributes()"
-              aria-label="نمایش ویژگی‌های دسته‌بندی"
-            ></button>
-            <button
-              pButton
-              type="button"
-              icon="pi pi-pencil"
-              class="edit-btn"
-              (click)="selectNode({ node })"
-              title="ویرایش دسته‌بندی"
-              [disabled]="!node.data?.id"
-              aria-label="ویرایش دسته‌بندی"
-            ></button>
-            <button
-              pButton
-              type="button"
-              icon="pi pi-trash"
-              class="p-button-danger delete-btn"
-              (click)="deleteCategory(node.data.id)"
-              title="حذف دسته‌بندی"
-              [disabled]="!node.data?.id"
-              aria-label="حذف دسته‌بندی"
-            ></button>
+    @if (categoriesQuery.isPending()) {
+      <p-progressSpinner aria-label="در حال بارگذاری دسته‌بندی‌ها"></p-progressSpinner>
+    } @else {
+      <p-tree
+        [value]="categoriesQuery.data()"
+        [lazy]="true"
+        (onNodeExpand)="loadNodeMutation.mutate($event.node.data.id)"
+        (onNodeSelect)="selectNode($event)"
+        selectionMode="single"
+      >
+        <ng-template let-node pTemplate="default">
+          <div class="node-content" [attr.aria-expanded]="node.expanded ? 'true' : 'false'" role="treeitem">
+            <span class="node-label">
+              @if (node.children && node.children.length) {
+                <i class="pi" [ngClass]="node.expanded ? 'pi-chevron-up' : 'pi-chevron-down'" (click)="toggleNode(node)" aria-label="باز و بسته کردن زیرمجموعه‌ها"></i>
+              }
+              {{ node.label }}
+            </span>
+            <div class="node-actions">
+              <button
+                pButton
+                type="button"
+                icon="pi pi-list"
+                class="show-attributes-btn"
+                (click)="showAttributesDialog(node)"
+                title="نمایش ویژگی‌ها"
+                [disabled]="!node.data?.id"
+                aria-label="نمایش ویژگی‌های دسته‌بندی"
+              ></button>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-pencil"
+                class="edit-btn"
+                (click)="selectNode({ node })"
+                title="ویرایش دسته‌بندی"
+                [disabled]="!node.data?.id"
+                aria-label="ویرایش دسته‌بندی"
+              ></button>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-trash"
+                class="p-button-danger delete-btn"
+                (click)="deleteCategory(node.data.id)"
+                title="حذف دسته‌بندی"
+                [disabled]="!node.data?.id || deleteCategoryMutation.isPending()"
+                aria-label="حذف دسته‌بندی"
+              ></button>
+            </div>
           </div>
-        </div>
-      </ng-template>
-    </p-tree>
-    @if (isLoadingAttributes()) {
-      <p-progressSpinner aria-label="در حال بارگذاری ویژگی‌ها"></p-progressSpinner>
+        </ng-template>
+      </p-tree>
     }
   </div>
 </div>
