@@ -1,5 +1,10 @@
-<p-menubar class="p-menubar" [model]="items" role="menubar" aria-label="منوی اصلی ناوبری">
+<p-menubar [model]="items">
   <ng-template pTemplate="start">
-    <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" aria-label="آواتار کاربر"></p-avatar>
+    <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"></p-avatar>
   </ng-template>
+
+  <div class="search-box" *ngIf="currentRoute === '/home'">
+    <p-inputicon class="pi pi-search"></p-inputicon>
+    <input type="text" pInputText placeholder="Search" />
+  </div>
 </p-menubar>
