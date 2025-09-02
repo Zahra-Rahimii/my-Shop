@@ -37,7 +37,7 @@ export const routes: Routes = [
         .then(c => c.CategoryTreeComponent),
   },
   {
-  path: 'tree-view',
+  path: 'categories',
   loadComponent: () =>
     import('./components/category/tree-view/tree-view.component')
       .then(c => c.TreeViewComponent),
