@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TreeNode } from 'primeng/api';
+import { first, firstValueFrom } from 'rxjs';
+import { injectQuery } from '@tanstack/angular-query-experimental';
 
 import { CategoryService } from '../../../services/category.service';
 import { AttributeService } from '../../../services/attribute.service';
@@ -20,62 +22,45 @@ export class CategoryAttributesComponent {
   private router = inject(Router);
   private categoryService = inject(CategoryService);
   private attributeService = inject(AttributeService);
-  node = signal<TreeNode | null>(null);
-  isLoading = signal(false);
 
-  constructor() {
-    const navigation = this.router.getCurrentNavigation();
-    const nodeFromState = navigation?.extras.state?.['node'] || null;
-    
-    if (nodeFromState) {
-      this.node.set(nodeFromState);
-    } else {
-      const categoryId = this.route.snapshot.paramMap.get('id');
-      if (categoryId) {
-        this.loadAttributes(+categoryId);
-      } else {
-        this.router.navigate(['/']);
-      }
-    }
-  }
+  node = signal<TreeNode | null>(null);
+
+  private categoryId = this.route.snapshot.paramMap.get('id');
 
   private loadAllInheritedAttributes(categoryId: number, collected: CategoryAttributeDTO[] = []): Promise<CategoryAttributeDTO[]> {
-    return new Promise((resolve, reject) => {
-      this.categoryService.getCategory(categoryId).subscribe({
-        next: category => {
-          this.attributeService.getCategoryAttributes(categoryId, false).subscribe({
-            next: attrs => {
-              const merged = [...collected, ...attrs.map(a => ({ ...a, inherited: collected.length > 0 }))];
-              if (category.parentId) this.loadAllInheritedAttributes(category.parentId, merged).then(resolve).catch(reject);
-              else resolve(merged);
-            },
-            error: reject
-          });
-        },
-        error: reject
-      });
-    });
+    return firstValueFrom(this.categoryService.getCategory(categoryId)).then(category =>
+      firstValueFrom(this.attributeService.getCategoryAttributes(categoryId,false)).then(attrs => {
+        const merged = [
+          ...collected,
+          ...attrs.map(a => ({...a, inherited: collected.length > 0}))
+        ];
+        if (category.parentId) {
+          return this.loadAllInheritedAttributes(category.parentId, merged);
+        }
+        return merged;
+      })
+    )
   }
 
-  private loadAttributes(categoryId: number) {
-    this.isLoading.set(true);
-    this.loadAllInheritedAttributes(categoryId)
-      .then(attrs => {
-        const node: TreeNode = {
-          key: categoryId.toString(),
-          label: 'دسته‌بندی', // می‌توانید نام واقعی را از API بگیرید
-          data: { id: categoryId, description: '', attributes: attrs },
-          children: [],
-          expanded: false
-        };
-        this.node.set(node);
-        this.isLoading.set(false);
-      })
-      .catch(() => {
-        this.isLoading.set(false);
-        this.router.navigate(['/']);
-      });
-  }
+attributesQuery = injectQuery(() => ({
+  queryKey: ['categoryAttributes', this.categoryId],
+  queryFn: () =>
+    this.categoryId
+      ? this.loadAllInheritedAttributes(+this.categoryId)
+      : Promise.resolve([]),
+  onSuccess: (attrs: CategoryAttributeDTO[]) => {
+    if (!this.categoryId) return;
+    const node: TreeNode = {
+      key: this.categoryId?.toString(),
+      label: 'دسته بندی',
+      data: { id: +this.categoryId, description: '', attributes: attrs },
+      children: [],
+      expanded: false
+    };
+    this.node.set(node);
+  },
+  onError: () => this.router.navigate(['/'])
+}));
 
   goBack() {
     this.router.navigate(['/']);
