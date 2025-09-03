@@ -4,8 +4,9 @@ import { take } from 'rxjs';
 import { TreeModule } from 'primeng/tree';
 import { TreeNode } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageService } from 'primeng/api';
+import { Router } from '@angular/router';
 
 import { CategoryService } from '../../../services/category.service';
 import { AttributeService } from '../../../services/attribute.service';
@@ -15,7 +16,7 @@ import { CategoryAttributeDTO } from '../../../models/attribute.model';
 @Component({
   selector: 'app-category-tree',
   standalone: true,
-  imports: [CommonModule, TreeModule, ButtonModule, DialogModule],
+  imports: [CommonModule, TreeModule, ButtonModule, ProgressSpinnerModule],
   templateUrl: './category-tree.component.html',
   styleUrls: ['./category-tree.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -23,12 +24,11 @@ import { CategoryAttributeDTO } from '../../../models/attribute.model';
 export class CategoryTreeComponent {
   categories = signal<TreeNode[]>([]);
   @Output() nodeSelected = new EventEmitter<number | null>();
-  showDialog = signal(false);
-  selectedNode = signal<TreeNode | null>(null);
   private categoryService = inject(CategoryService);
   private attributeService = inject(AttributeService);
   private messageService = inject(MessageService);
-  private isLoadingAttributes = false;
+  private router = inject(Router);
+  isLoadingAttributes = signal(false);
 
   constructor() {
     this.loadCategories();
@@ -104,30 +104,23 @@ export class CategoryTreeComponent {
   }
 
   showAttributesDialog(node: TreeNode) {
-    if (this.isLoadingAttributes || this.showDialog()) return;
-    if (!node.data?.id) return;
+    if (this.isLoadingAttributes() || !node.data?.id) return;
 
-    this.isLoadingAttributes = true;
-    this.selectedNode.set(node);
+    this.isLoadingAttributes.set(true);
 
     this.loadAllInheritedAttributes(node.data.id)
       .then(attributes => {
         node.data.attributes = attributes;
-        this.showDialog.set(true);
-        this.isLoadingAttributes = false;
+        this.router.navigate([`/category/${node.data.id}/attributes`], {
+          state: { node }
+        });
+        this.isLoadingAttributes.set(false);
+        this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'ویژگی‌ها با موفقیت لود شدند', life: 3000 });
       })
       .catch(() => {
-        this.isLoadingAttributes = false;
+        this.isLoadingAttributes.set(false);
+        this.messageService.add({ severity: 'error', summary: 'خطا', detail: 'لود ویژگی‌ها انجام نشد', life: 3000 });
       });
-  }
-
-  onDialogShow() {
-    console.log('دیالوگ ویژگی‌ها باز شد');
-  }
-
-  onDialogHide() {
-    this.showDialog.set(false);
-    this.isLoadingAttributes = false;
   }
 
   deleteCategory(id: number) {

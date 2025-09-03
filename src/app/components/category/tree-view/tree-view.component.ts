@@ -3,8 +3,9 @@ import { TreeNode } from 'primeng/api';
 import { MessageService } from 'primeng/api';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
 import { TreeModule } from 'primeng/tree';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { Router } from '@angular/router';
 
 import { CategoryService } from '../../../services/category.service';
 import { AttributeService } from '../../../services/attribute.service';
@@ -14,19 +15,18 @@ import { CategoryAttributeDTO } from '../../../models/attribute.model';
 @Component({
   selector: 'app-tree-view',
   standalone: true,
-  imports: [CommonModule, TreeModule, ButtonModule, DialogModule],
+  imports: [CommonModule, TreeModule, ButtonModule, ProgressSpinnerModule],
   templateUrl: './tree-view.component.html',
   styleUrls: ['./tree-view.component.css'],
   providers: [MessageService]
 })
 export class TreeViewComponent {
   categories = signal<TreeNode[]>([]);
-  selectedNode = signal<TreeNode | null>(null);
-  showDialog = signal(false);
+  isLoadingAttributes = signal(false);
   private categoryService = inject(CategoryService);
   private attributeService = inject(AttributeService);
   private messageService = inject(MessageService);
-  private isLoadingAttributes = false;
+  private router = inject(Router);
 
   constructor() {
     this.loadCategories();
@@ -98,17 +98,17 @@ export class TreeViewComponent {
   }
 
   showAttributesDialog(node: TreeNode) {
-    if (this.isLoadingAttributes || this.showDialog()) return;
-    if (!node.data?.id) return;
+    if (this.isLoadingAttributes() || !node.data?.id) return;
 
-    this.isLoadingAttributes = true;
-    this.selectedNode.set(node);
+    this.isLoadingAttributes.set(true);
 
     this.loadAllInheritedAttributes(node.data.id)
       .then(attrs => {
         node.data.attributes = attrs;
-        this.showDialog.set(true);
-        this.isLoadingAttributes = false;
+        this.router.navigate([`/category/${node.data.id}/attributes`], {
+          state: { node }
+        });
+        this.isLoadingAttributes.set(false);
         this.messageService.clear();
         this.messageService.add({
           severity: 'success',
@@ -118,7 +118,7 @@ export class TreeViewComponent {
         });
       })
       .catch(() => {
-        this.isLoadingAttributes = false;
+        this.isLoadingAttributes.set(false);
         this.messageService.clear();
         this.messageService.add({
           severity: 'error',

@@ -405,6 +405,7 @@ export class ProductFormComponent implements OnInit, OnChanges {
 
 
 
+<<<<<<< feature/updated-header
 
 
 
@@ -451,6 +452,40 @@ export class ProductFormComponent implements OnInit, OnChanges {
         // console.log('🖼️ Preview Base64 URL:', e.target.result);
       };
       reader.readAsDataURL(file);
+=======
+    const productDTO: ProductDTO = {
+      title: this.productForm.get('title')?.value?.toString() || '',
+      description: this.productForm.get('description')?.value?.toString() || '',
+      price: Number(this.productForm.get('price')?.value) || 0,
+      stock: Number(this.productForm.get('stock')?.value) || 0,
+      categoryId: Number(this.productForm.get('categoryId')?.value),
+      attributeValues: attributes,
+      condition: ProductCondition.NEW,
+      id: 0
+    };
+
+    const id = this.editingProductId(); 
+  if (id !== null) {                  
+    this.productService.updateProduct(id, productDTO).subscribe({
+      next: () => {
+        this.resetForm();
+        this.productAdded.emit();
+        this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'محصول ویرایش شد', life: 3000 });
+      }
+    });
+  } else {
+    this.productService.addProduct(productDTO).subscribe({
+      next: () => {
+        this.productForm.reset();
+        this.categoryAttributes.set([]);
+        this.attributeValuesFormArray.clear();
+        this.productAdded.emit();
+        this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'محصول با موفقیت اضافه شد', life: 3000 });
+      },
+      error: () => {
+        // خطا توسط BaseService مدیریت می‌شود
+      },
+>>>>>>> develop
     });
   }
   
