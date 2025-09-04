@@ -1,11 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { TreeNode } from 'primeng/api';
-import { MessageService } from 'primeng/api';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { TreeModule } from 'primeng/tree';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+import { injectQuery } from '@tanstack/angular-query-experimental';
 
 import { CategoryService } from '../../../services/category.service';
 import { AttributeService } from '../../../services/attribute.service';
@@ -22,29 +24,40 @@ import { CategoryAttributeDTO } from '../../../models/attribute.model';
 })
 export class TreeViewComponent {
   categories = signal<TreeNode[]>([]);
-  isLoadingAttributes = signal(false);
+  expandedNodeIds = signal<Set<number>>(new Set()); 
   private categoryService = inject(CategoryService);
   private attributeService = inject(AttributeService);
   private messageService = inject(MessageService);
   private router = inject(Router);
 
   constructor() {
-    this.loadCategories();
+    this.loadCategoriesQuery();
   }
 
-  loadCategories() {
-    this.categoryService.getCategories().subscribe({
-      next: (cats) => {
+  private loadCategoriesQuery() {
+    injectQuery(() => ({
+      queryKey: ['categories'],
+      queryFn: () => firstValueFrom(this.categoryService.getCategories()),
+      onSuccess: (cats: CategoryTreeNodeDTO[]) => {
         this.categories.set(this.mapCategoriesToTreeNodes(cats));
         this.messageService.clear();
-        this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'دسته‌بندی‌ها با موفقیت لود شدند', life: 3000 });
+        this.messageService.add({
+          severity: 'success',
+          summary: 'موفق',
+          detail: 'دسته‌بندی‌ها با موفقیت لود شدند',
+          life: 3000
+        });
       },
-      error: (err) => {
-        console.error('خطا در لود دسته‌بندی‌ها:', err);
+      onError: () => {
         this.messageService.clear();
-        this.messageService.add({ severity: 'error', summary: 'خطا', detail: 'لود دسته‌بندی‌ها انجام نشد', life: 3000 });
+        this.messageService.add({
+          severity: 'error',
+          summary: 'خطا',
+          detail: 'لود دسته‌بندی‌ها انجام نشد',
+          life: 3000
+        });
       }
-    });
+    }));
   }
 
   mapCategoriesToTreeNodes(categories: CategoryTreeNodeDTO[]): TreeNode[] {
@@ -59,56 +72,53 @@ export class TreeViewComponent {
 
   toggleNode(node: TreeNode) {
     node.expanded = !node.expanded;
-    if (node.expanded && !node.children?.length) {
-      this.loadNode({ node });
+    const expandedIds = new Set(this.expandedNodeIds());
+    node.expanded ? expandedIds.add(node.data.id) : expandedIds.delete(node.data.id);
+    this.expandedNodeIds.set(expandedIds);
+
+    if (node.expanded && (!node.children || node.children.length === 0)) {
+      this.loadNodeChildrenQuery(node);
     }
   }
 
-  loadNode(event: any) {
-    if (event.node && !event.node.children?.length) {
-      this.categoryService.getCategoryChildren(event.node.data.id).subscribe({
-        next: children => {
-          event.node.children = this.mapCategoriesToTreeNodes(children);
-          this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'زیرمجموعه‌ها با موفقیت لود شدند', life: 3000 });
-        },
-        error: (err) => {
-          console.error('خطا در لود زیرمجموعه:', err);
-          this.messageService.add({ severity: 'error', summary: 'خطا', detail: 'لود زیرمجموعه انجام نشد', life: 3000 });
-        }
-      });
-    }
+  private loadNodeChildrenQuery(node: TreeNode) {
+    injectQuery(() => ({
+      queryKey: ['categoryChildren', node.data.id],
+      queryFn: () => firstValueFrom(this.categoryService.getCategoryChildren(node.data.id)),
+      onSuccess: (children: CategoryTreeNodeDTO[]) => {
+        node.children = this.mapCategoriesToTreeNodes(children);
+      },
+      onError: () => {
+        this.messageService.clear();
+        this.messageService.add({
+          severity: 'error',
+          summary: 'خطا',
+          detail: 'لود زیرمجموعه انجام نشد',
+          life: 3000
+        });
+      }
+    }));
   }
 
   private loadAllInheritedAttributes(categoryId: number, collected: CategoryAttributeDTO[] = []): Promise<CategoryAttributeDTO[]> {
-    return new Promise((resolve, reject) => {
-      this.categoryService.getCategory(categoryId).subscribe({
-        next: category => {
-          this.attributeService.getCategoryAttributes(categoryId, false).subscribe({
-            next: attrs => {
-              const merged = [...collected, ...attrs.map(a => ({ ...a, inherited: collected.length > 0 }))];
-              if (category.parentId) this.loadAllInheritedAttributes(category.parentId, merged).then(resolve).catch(reject);
-              else resolve(merged);
-            },
-            error: reject
-          });
-        },
-        error: reject
-      });
-    });
+    return firstValueFrom(this.categoryService.getCategory(categoryId)).then(category =>
+      firstValueFrom(this.attributeService.getCategoryAttributes(categoryId, false)).then(attrs => {
+        const merged = [...collected, ...attrs.map(a => ({ ...a, inherited: collected.length > 0 }))];
+        if (category.parentId) return this.loadAllInheritedAttributes(category.parentId, merged);
+        return merged;
+      })
+    );
   }
 
   showAttributesDialog(node: TreeNode) {
-    if (this.isLoadingAttributes() || !node.data?.id) return;
+    if (!node.data?.id) return;
 
-    this.isLoadingAttributes.set(true);
-
-    this.loadAllInheritedAttributes(node.data.id)
-      .then(attrs => {
+    injectQuery(() => ({
+      queryKey: ['categoryAttributes', node.data.id],
+      queryFn: () => this.loadAllInheritedAttributes(node.data.id),
+      onSuccess: (attrs: CategoryAttributeDTO[]) => {
         node.data.attributes = attrs;
-        this.router.navigate([`/category/${node.data.id}/attributes`], {
-          state: { node }
-        });
-        this.isLoadingAttributes.set(false);
+        this.router.navigate([`/category/${node.data.id}/attributes`], { state: { node } });
         this.messageService.clear();
         this.messageService.add({
           severity: 'success',
@@ -116,9 +126,8 @@ export class TreeViewComponent {
           detail: 'ویژگی‌ها با موفقیت لود شدند',
           life: 3000
         });
-      })
-      .catch(() => {
-        this.isLoadingAttributes.set(false);
+      },
+      onError: () => {
         this.messageService.clear();
         this.messageService.add({
           severity: 'error',
@@ -126,10 +135,13 @@ export class TreeViewComponent {
           detail: 'لود ویژگی‌ها انجام نشد',
           life: 3000
         });
-      });
+      }
+    }));
   }
 
   trackByAttribute(index: number, attr: CategoryAttributeDTO) {
     return attr.id;
   }
 }
+
+

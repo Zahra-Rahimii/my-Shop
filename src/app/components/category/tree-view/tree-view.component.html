@@ -1,36 +1,33 @@
 <div class="container">
   <div class="tree-container">
-    <p-tree
-      [value]="categories()"
-      [lazy]="true"
-      (onNodeExpand)="loadNode($event)"
-      selectionMode="single"
-    >
+    <p-tree [value]="categories()" selectionMode="single">
       <ng-template let-node pTemplate="default">
         <div class="node-content" [attr.aria-expanded]="node.expanded ? 'true' : 'false'" role="treeitem">
           <span class="node-label">
-            @if (node.children && node.children.length) {
-              <i class="pi" [ngClass]="node.expanded ? 'pi-chevron-up' : 'pi-chevron-down'" (click)="toggleNode(node)" aria-label="باز و بسته کردن زیرمجموعه‌ها"></i>
+            @if(node.children && node.children.length) {
+              <i class="pi" [ngClass]="node.expanded ? 'pi-chevron-up' : 'pi-chevron-down'" 
+                 (click)="toggleNode(node)" aria-label="باز و بسته کردن زیرمجموعه‌ها">
+              </i>
             }
             {{ node.label }}
           </span>
+
           <div class="node-actions">
-            <button
-              pButton
-              type="button"
-              icon="pi pi-list"
-              class="show-attributes-btn"
-              (click)="showAttributesDialog(node)"
-              title="نمایش ویژگی‌ها"
-              [disabled]="!node.data?.id || isLoadingAttributes()"
-              aria-label="نمایش ویژگی‌های دسته‌بندی"
-            ></button>
+            @if(node.data?.id && node.expanded && !node.children?.length) {
+              <p-progressSpinner styleClass="small-spinner" aria-label="در حال بارگذاری زیرمجموعه‌ها"></p-progressSpinner>
+            }
+
+            <button pButton type="button" icon="pi pi-list" class="show-attributes-btn"
+              (click)="showAttributesDialog(node)" title="نمایش ویژگی‌ها"
+              [disabled]="!node.data?.id" aria-label="نمایش ویژگی‌های دسته‌بندی">
+            </button>
           </div>
         </div>
       </ng-template>
     </p-tree>
-    @if (isLoadingAttributes()) {
-      <p-progressSpinner aria-label="در حال بارگذاری ویژگی‌ها"></p-progressSpinner>
+
+    @if(categories().length === 0) {
+      <p-progressSpinner aria-label="در حال بارگذاری دسته‌بندی‌ها"></p-progressSpinner>
     }
   </div>
 </div>
