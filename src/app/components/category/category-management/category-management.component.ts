@@ -1,5 +1,6 @@
 import { Component, signal, ViewChild } from '@angular/core';
 import { MessageService } from 'primeng/api';
+import { injectQueryClient } from '@tanstack/angular-query-experimental';
 
 import { CategoryTreeComponent } from "../category-tree/category-tree.component";
 import { CategoryFormComponent } from "../category-form/category-form.component";
@@ -15,12 +16,13 @@ export class CategoryManagementComponent {
   selectedCategoryId = signal<number | null>(null);
   @ViewChild(CategoryTreeComponent) categoryTree!: CategoryTreeComponent;
 
+  private queryClient = injectQueryClient();
+  
   onCategorySelected(id: number | null) {
     this.selectedCategoryId.set(id);
   }
 
   onCategoryUpdated() {
     this.selectedCategoryId.set(null);
-    this.categoryTree.loadCategories();
-  }
+    this.queryClient.invalidateQueries({ queryKey: ['categories'] });  }
 }
