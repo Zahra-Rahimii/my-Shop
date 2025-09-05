@@ -35,19 +35,15 @@ export class CategoryTreeComponent {
   isLoadingAttributes = signal(false);
   loadingChildrenIds = signal<Set<number>>(new Set());
 
-  // === Query برای دسته‌بندی‌ها ===
+
   categoriesQuery = injectQuery(() => ({
     queryKey: ['categories'],
     queryFn: () => firstValueFrom(this.categoryService.getCategories()),
     onSuccess: (cats: CategoryTreeNodeDTO[]) => {
       this.categories.set(this.mapCategoriesToTreeNodes(cats));
-    },
-    onError: () => {
-      this.messageService.add({ severity: 'error', summary: 'خطا', detail: 'لود دسته‌بندی‌ها انجام نشد' });
     }
   }));
 
-  // === Mutation حذف دسته‌بندی ===
   deleteCategoryMutation = injectMutation(() => ({
     mutationFn: (id: number) => firstValueFrom(this.categoryService.deleteCategory(id)),
     onSuccess: () => {
@@ -60,72 +56,98 @@ export class CategoryTreeComponent {
     }
   }));
 
-  // === تبدیل API response به TreeNode ===
   mapCategoriesToTreeNodes(categories: CategoryTreeNodeDTO[]): TreeNode[] {
     return categories
-      .filter(cat => cat?.data?.id != null)
-      .map(cat => ({
-        key: cat.key,
-        label: cat.label || 'بدون نام',
+      .filter(category => category && category.data && category.data.id != null)
+      .map(category => ({
+        key: category.key,
+        label: category.label || 'بدون نام',
         data: {
-          id: cat.data.id,
-          description: cat.data.description || '',
+          id: category.data.id,
+          description: category.data.description || '',
           attributes: [] as CategoryAttributeDTO[]
         },
-        children: cat.children ? this.mapCategoriesToTreeNodes(cat.children) : [],
+        children: category.children ? this.mapCategoriesToTreeNodes(category.children) : [],
         expanded: false
       }));
   }
 
   selectNode(event: any) {
-    const id = event?.node?.data?.id ?? null;
-    this.nodeSelected.emit(id ? Number(id) : null);
-  }
-
-  toggleNode(node: TreeNode) {
-    node.expanded = !node.expanded;
-    if (node.expanded && !node.children?.length) {
-      this.loadNodeChildren(node);
+    if (event.node?.data?.id) {
+      this.nodeSelected.emit(Number(event.node.data.id));
+    } else {
+      this.nodeSelected.emit(null);
     }
   }
 
-  private async loadNodeChildren(node: TreeNode) {
-    this.loadingChildrenIds.update(s => s.add(node.data.id));
-    try {
-      const children = await firstValueFrom(this.categoryService.getCategoryChildren(node.data.id));
-      node.children = this.mapCategoriesToTreeNodes(children);
-    } catch {
-      this.messageService.add({ severity: 'error', summary: 'خطا', detail: 'لود زیرمجموعه انجام نشد' });
-    } finally {
-      this.loadingChildrenIds.update(s => {
-        s.delete(node.data.id);
-        return s;
+toggleNode(node: TreeNode) {
+  node.expanded = !node.expanded;
+  if (node.expanded && !node.children?.length) {
+    this.loadingChildrenIds.update(set => set.add(node.data.id));
+    this.loadNodeChildren(node).finally(() => {
+      this.loadingChildrenIds.update(set => {
+        set.delete(node.data.id);
+        return set;
       });
+    });
+  }
+}
+
+
+private loadNodeChildren(node: TreeNode): Promise<void> {
+  const nodeChildrenQuery = injectQuery(() => ({
+    queryKey: ['categoryChildren', node.data.id],
+    queryFn: () => firstValueFrom(this.categoryService.getCategoryChildren(node.data.id)),
+    enabled: false
+  }));
+
+  return nodeChildrenQuery.refetch().then(result => {
+    if (result.data) {
+      node.children = this.mapCategoriesToTreeNodes(result.data);
     }
+  }).catch(() => {
+    this.messageService.add({ severity: 'error', summary: 'خطا', detail: 'لود زیرمجموعه انجام نشد' });
+  });
+}
+
+
+  private loadAllInheritedAttributes(categoryId: number, collected: CategoryAttributeDTO[] = []): Promise<CategoryAttributeDTO[]> {
+    return firstValueFrom(this.categoryService.getCategory(categoryId)).then(category =>
+      firstValueFrom(this.attributeService.getCategoryAttributes(categoryId, false)).then(attrs => {
+        const merged = [...collected, ...attrs.map(a => ({ ...a, inherited: collected.length > 0 }))];
+        if (category.parentId) {
+          return this.loadAllInheritedAttributes(category.parentId, merged);
+        }
+        return merged;
+      })
+    );
   }
 
-  private async loadAllInheritedAttributes(categoryId: number, collected: CategoryAttributeDTO[] = []): Promise<CategoryAttributeDTO[]> {
-    const category = await firstValueFrom(this.categoryService.getCategory(categoryId));
-    const attrs = await firstValueFrom(this.attributeService.getCategoryAttributes(categoryId, false));
-    const merged = [...collected, ...attrs.map(a => ({ ...a, inherited: collected.length > 0 }))];
-    if (category.parentId) return this.loadAllInheritedAttributes(category.parentId, merged);
-    return merged;
-  }
-
-  async showAttributesDialog(node: TreeNode) {
+  showAttributesDialog(node: TreeNode) {
     if (this.isLoadingAttributes() || !node.data?.id) return;
     this.isLoadingAttributes.set(true);
 
-    try {
-      const attributes = await this.loadAllInheritedAttributes(node.data.id);
-      node.data.attributes = attributes;
+const nodeAttributesQuery = injectQuery(() => ({
+  queryKey: ['categoryAttributes', node.data.id],
+  queryFn: () => this.loadAllInheritedAttributes(node.data.id),
+  enabled: false
+}));
+
+nodeAttributesQuery.refetch()
+  .then(result => {
+    if (result.data) {
+      node.data.attributes = result.data;
       this.router.navigate([`/category/${node.data.id}/attributes`], { state: { node } });
       this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'ویژگی‌ها با موفقیت لود شدند' });
-    } catch {
-      this.messageService.add({ severity: 'error', summary: 'خطا', detail: 'لود ویژگی‌ها انجام نشد' });
-    } finally {
-      this.isLoadingAttributes.set(false);
     }
+  })
+  .catch(() => {
+    this.messageService.add({ severity: 'error', summary: 'خطا', detail: 'لود ویژگی‌ها انجام نشد' });
+  })
+  .finally(() => {
+    this.isLoadingAttributes.set(false);
+  });
+
   }
 
   deleteCategory(id: number) {

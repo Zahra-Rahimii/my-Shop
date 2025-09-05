@@ -31,14 +31,14 @@
       <span class="error">نام ویژگی اجباری است</span>
     }
   </div>
-  @if(isLoadingAttributes()) {
+  @if(inheritedAttributesQuery.isPending() || categoryAttributesQuery.isPending()) {
     <p-progressSpinner styleClass="custom-spinner" strokeWidth="4"></p-progressSpinner>
   }
-  @if(categoryAttributes().length || inheritedAttributes().length) {
+  @if(categoryAttributes().length || (inheritedAttributesQuery.data()?.length ?? 0)) {
     <div class="attributes-list">
       <h3>ویژگی‌های دسته</h3>
       <ul>
-        @for(attr of inheritedAttributes(); track trackByAttribute($index, attr)) {
+        @for(attr of inheritedAttributesQuery.data() ?? []; track trackByAttribute($index, attr)) {
           <li class="inherited">
             {{ attr.attributeName }} ({{ attr.attributeType }}) (ارث‌بری‌شده) {{ attr.required ? '(اجباری)' : '' }}
           </li>
@@ -53,6 +53,6 @@
       </ul>
     </div>
   }
-  <button pButton type="submit" [label]="editMode() ? 'ویرایش دسته' : 'ثبت دسته'" class="submit-btn"
-    [disabled]="categoryForm.invalid || isLoadingAttributes()"></button>
+  <button pButton type="submit" [label]="categoryId() ? 'ویرایش دسته' : 'ثبت دسته'" class="submit-btn"
+    [disabled]="categoryForm.invalid || inheritedAttributesQuery.isPending() || categoryAttributesQuery.isPending()"></button>
 </form>
