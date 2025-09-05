@@ -6,7 +6,8 @@ import { providePrimeNG } from 'primeng/config';
 import mat from '@primeuix/themes/lara';
 import { MessageService } from 'primeng/api';
 import { provideAnimations } from '@angular/platform-browser/animations';
-
+import { provideQueryClient } from '@tanstack/angular-query-experimental';
+import { QueryClient } from '@tanstack/query-core';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
@@ -26,6 +27,18 @@ export const appConfig: ApplicationConfig = {
     }),
 
     // Services
-    MessageService
+    MessageService,
+
+    // TanStack Query
+    provideQueryClient(new QueryClient({
+      defaultOptions: {
+        queries: {
+          enabled: false, 
+          retry: 3,
+          retryDelay: 1000,
+          staleTime: 5 * 60 * 1000,
+        }
+      }
+    })),
   ]
 };
