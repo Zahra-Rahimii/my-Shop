@@ -72,11 +72,13 @@
     <textarea pInputTextarea id="description" formControlName="description" class="form-textarea"
       placeholder="توضیحات"></textarea>
   </div>
-  <div class="form-group">
-    <label for="parentId">دسته والد</label>
-    <p-select id="parentId" formControlName="parentId" [options]="categories()" optionLabel="label" optionValue="value"
-      placeholder="انتخاب دسته والد" [showClear]="true" />
-  </div>
+<div class="form-group">
+  <label for="parentId">دسته والد</label>
+  <p-select id="parentId" formControlName="parentId" 
+            [options]="categoriesQuery.data() || categories()" 
+            optionLabel="label" optionValue="value"
+            placeholder="انتخاب دسته والد" [showClear]="true" />
+</div>
   <div class="form-group">
     <label>ویژگی جدید</label>
     <div class="attribute-input">
