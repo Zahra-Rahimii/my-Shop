@@ -1,12 +1,13 @@
-import { Component, EventEmitter, Output, signal, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, effect, signal, output, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { take } from 'rxjs';
 import { TreeModule } from 'primeng/tree';
 import { TreeNode } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
+import { injectQuery, injectMutation, injectQueryClient } from '@tanstack/angular-query-experimental';
+import { lastValueFrom } from 'rxjs';
 
 import { CategoryService } from '../../../services/category.service';
 import { AttributeService } from '../../../services/attribute.service';
@@ -19,30 +20,62 @@ import { CategoryAttributeDTO } from '../../../models/attribute.model';
   imports: [CommonModule, TreeModule, ButtonModule, ProgressSpinnerModule],
   templateUrl: './category-tree.component.html',
   styleUrls: ['./category-tree.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoryTreeComponent {
   categories = signal<TreeNode[]>([]);
-  @Output() nodeSelected = new EventEmitter<number | null>();
+  nodeSelected = output<number | null>();
+  editNode = output<TreeNode>(); // اضافه کردن output جدید برای ویرایش
+  isLoadingAttributes = signal(false);
   private categoryService = inject(CategoryService);
   private attributeService = inject(AttributeService);
   private messageService = inject(MessageService);
   private router = inject(Router);
-  isLoadingAttributes = signal(false);
+  private queryClient = injectQueryClient();
+
+  categoriesQuery = injectQuery(() => ({
+    queryKey: ['categories'],
+    queryFn: () => lastValueFrom(this.categoryService.getCategories()).then(cats => this.mapCategoriesToTreeNodes(cats)),
+    staleTime: 5 * 60 * 1000,
+    onSuccess: (data: TreeNode[]) => {
+      this.categories.set(data);
+      this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'دسته‌بندی‌ها با موفقیت لود شدند', life: 3000 });
+    },
+    onError: () => {
+      // خطاها توسط BaseService مدیریت می‌شوند
+    },
+  }));
+
+  childrenQuery = injectQuery(() => ({
+    queryKey: ['category-children'],
+    queryFn: () => Promise.resolve([] as TreeNode[]),
+    enabled: false,
+  }));
+
+  deleteCategoryMutation = injectMutation(() => ({
+    mutationFn: (id: number) => lastValueFrom(this.categoryService.deleteCategory(id)),
+    onSuccess: () => {
+      this.queryClient.invalidateQueries({ queryKey: ['categories'] });
+      this.nodeSelected.emit(null);
+      this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'دسته‌بندی با موفقیت حذف شد', life: 3000 });
+    },
+    onError: () => {
+      // خطاها توسط BaseService مدیریت می‌شوند
+    },
+  }));
 
   constructor() {
-    this.loadCategories();
-  }
-
-  loadCategories() {
-    this.categoryService.getCategories().pipe(take(1)).subscribe({
-      next: (cats) => {
-        this.categories.set(this.mapCategoriesToTreeNodes(cats));
-      },
-      error: () => {
-        // Handled by BaseService
+    effect(() => {
+      const data = this.categoriesQuery.data();
+      if (data) {
+        this.categories.set(data);
       }
     });
+  }
+
+  // متد عمومی برای به‌روزرسانی دسته‌بندی‌ها
+  refreshCategories() {
+    this.queryClient.invalidateQueries({ queryKey: ['categories'] });
   }
 
   mapCategoriesToTreeNodes(categories: CategoryTreeNodeDTO[]): TreeNode[] {
@@ -54,19 +87,23 @@ export class CategoryTreeComponent {
         data: {
           id: category.data.id,
           description: category.data.description || '',
-          attributes: [] as CategoryAttributeDTO[]
+          attributes: [] as CategoryAttributeDTO[],
         },
         children: category.children ? this.mapCategoriesToTreeNodes(category.children) : [],
-        expanded: false
+        expanded: false,
+        leaf: !category.children?.length,
       }));
   }
 
   selectNode(event: any) {
-    if (event.node && event.node.data && event.node.data.id) {
-      this.nodeSelected.emit(Number(event.node.data.id));
-    } else {
-      this.nodeSelected.emit(null);
-    }
+    const id = event.node?.data?.id ? Number(event.node.data.id) : null;
+    this.nodeSelected.emit(id);
+  }
+
+  // متد جدید برای ویرایش
+  editCategory(node: TreeNode) {
+    if (!node.data?.id) return;
+    this.editNode.emit(node);
   }
 
   toggleNode(node: TreeNode) {
@@ -77,42 +114,23 @@ export class CategoryTreeComponent {
   }
 
   loadAllInheritedAttributes(categoryId: number, collected: CategoryAttributeDTO[] = []): Promise<CategoryAttributeDTO[]> {
-    return new Promise((resolve, reject) => {
-      this.categoryService.getCategory(categoryId).pipe(take(1)).subscribe({
-        next: (category) => {
-          this.attributeService.getCategoryAttributes(categoryId, false).pipe(take(1)).subscribe({
-            next: (attrs) => {
-              const merged = [
-                ...collected,
-                ...attrs.map(attr => ({
-                  ...attr,
-                  inherited: collected.length > 0
-                }))
-              ];
-              if (category.parentId) {
-                this.loadAllInheritedAttributes(category.parentId, merged).then(resolve).catch(reject);
-              } else {
-                resolve(merged);
-              }
-            },
-            error: reject
-          });
-        },
-        error: reject
-      });
-    });
+    return lastValueFrom(this.categoryService.getCategory(categoryId)).then(category =>
+      lastValueFrom(this.attributeService.getCategoryAttributes(categoryId, false)).then(attrs => {
+        const merged = [...collected, ...attrs.map(attr => ({ ...attr, inherited: collected.length > 0 }))];
+        return category.parentId ? this.loadAllInheritedAttributes(category.parentId, merged) : merged;
+      })
+    );
   }
 
   showAttributesDialog(node: TreeNode) {
     if (this.isLoadingAttributes() || !node.data?.id) return;
 
     this.isLoadingAttributes.set(true);
-
     this.loadAllInheritedAttributes(node.data.id)
       .then(attributes => {
         node.data.attributes = attributes;
         this.router.navigate([`/category/${node.data.id}/attributes`], {
-          state: { node }
+          state: { node },
         });
         this.isLoadingAttributes.set(false);
         this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'ویژگی‌ها با موفقیت لود شدند', life: 3000 });
@@ -124,27 +142,20 @@ export class CategoryTreeComponent {
   }
 
   deleteCategory(id: number) {
-    this.categoryService.deleteCategory(id).pipe(take(1)).subscribe({
-      next: () => {
-        this.loadCategories();
-        this.nodeSelected.emit(null);
-        this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'دسته‌بندی با موفقیت حذف شد', life: 3000 });
-      },
-      error: () => {
-        // Handled by BaseService
-      }
-    });
+    this.deleteCategoryMutation.mutate(id);
   }
 
   loadNode(event: any) {
     if (event.node && !event.node.children?.length) {
-      this.categoryService.getCategoryChildren(event.node.data.id).pipe(take(1)).subscribe({
-        next: (children) => {
-          event.node.children = this.mapCategoriesToTreeNodes(children);
-        },
-        error: () => {
-          // Handled by BaseService
-        }
+      this.queryClient.fetchQuery({
+        queryKey: ['category-children', event.node.data.id],
+        queryFn: () =>
+          lastValueFrom(this.categoryService.getCategoryChildren(event.node.data.id)).then(children =>
+            this.mapCategoriesToTreeNodes(children)
+          ),
+      }).then(children => {
+        event.node.children = children;
+        this.categories.update(cats => [...cats]);
       });
     }
   }
