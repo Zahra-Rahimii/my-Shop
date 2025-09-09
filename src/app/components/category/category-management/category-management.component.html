@@ -2,8 +2,9 @@
   <div class="dashboard-grid">
     <div class="card">
       <h2>درخت دسته‌بندی</h2>
-      <app-category-tree (nodeSelected)="onCategorySelected($event)" />
-    </div>
+<app-category-tree 
+  (nodeSelected)="onCategorySelected($event)" 
+  (editNode)="onEditNode($event)" />    </div>
     <div class="card">
       <h2>مدیریت دسته‌بندی</h2>
       <app-category-form [categoryId]="selectedCategoryId()" (categoryUpdated)="onCategoryUpdated()" />

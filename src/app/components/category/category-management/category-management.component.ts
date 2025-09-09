@@ -23,8 +23,8 @@ export class CategoryManagementComponent {
     this.selectedCategoryId.set(node.data?.id || null);
   }
   
-  onCategoryUpdated() {
-    this.selectedCategoryId.set(null);
-    this.categoryTree.refreshCategories(); // جایگزین loadCategories
-  }
+onCategoryUpdated() {
+  this.selectedCategoryId.set(null);
+  this.categoryTree.refreshCategories(); // اطمینان از به‌روزرسانی درخت
+}
 }

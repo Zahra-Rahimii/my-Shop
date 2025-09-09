@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { BaseService } from './base.service';
 
 import { Category, CategoryDTO, CategoryTreeNodeDTO } from '../models/category.model';
@@ -15,12 +15,19 @@ export class CategoryService extends BaseService {
   /**
    * گرفتن درخت دسته‌بندی‌ها
    */
-  getCategories(): Observable<CategoryTreeNodeDTO[]> {
-    return this.get<CategoryTreeNodeDTO[]>(this.treeEndpoint).pipe(
-      catchError(this.handleError)
-    );
-  }
-
+getCategories(): Observable<CategoryTreeNodeDTO[]> {
+  const url = `${this.apiUrl}/${this.treeEndpoint}`;
+  console.log('🌐 ارسال درخواست به:', url);
+  
+  return this.http.get<CategoryTreeNodeDTO[]>(url).pipe(
+    tap(response => console.log('📨 پاسخ API:', response)),
+    catchError(error => {
+      console.error('🔥 خطای HTTP:', error);
+      console.error('📊 وضعیت خطا:', error.status, error.message);
+      return this.handleError(error);
+    })
+  );
+}
   /**
    * گرفتن یک دسته‌بندی خاص
    */
