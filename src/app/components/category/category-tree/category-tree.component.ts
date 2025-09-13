@@ -35,9 +35,12 @@ export class CategoryTreeComponent {
 
   categoriesQuery = injectQuery(() => ({
     queryKey: ['categories'],
-    queryFn: () => lastValueFrom(this.categoryService.getCategories()).then(cats => this.mapCategoriesToTreeNodes(cats)),
-    staleTime: 5 * 60 * 1000,
+queryFn: () => {
+    console.log('Running categoriesQuery with real API - Tree Component');
+    return lastValueFrom(this.categoryService.getCategories()).then(cats => this.mapCategoriesToTreeNodes(cats));
+  },    staleTime: 5 * 60 * 1000,
     onSuccess: (data: TreeNode[]) => {
+      console.log('onSuccess categoriesQuery - Tree Component, data length:', data.length);
       this.categories.set(data);
       this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'دسته‌بندی‌ها با موفقیت لود شدند', life: 3000 });
     },
@@ -67,6 +70,7 @@ export class CategoryTreeComponent {
   constructor() {
     effect(() => {
       const data = this.categoriesQuery.data();
+      console.log('Effect triggered in Tree Component, data length:', data?.length);
       if (data) {
         this.categories.set(data);
       }

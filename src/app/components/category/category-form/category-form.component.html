@@ -1,4 +1,41 @@
+<!-- <div class="form-container">
+  <div class="form-group">
+    <label>دسته والد</label>
+    <div>Debug categoriesTree: {{ categoriesTree() | json }}</div>
+    @if (categoriesQuery.isLoading()) {
+      <p-progressSpinner aria-label="در حال بارگذاری دسته‌بندی‌ها"></p-progressSpinner>
+      <p>در حال بارگذاری...</p>
+    } @else if (categoriesQuery.isError()) {
+      <p-message severity="error" [text]="'خطا در بارگذاری دسته‌بندی‌ها: ' + (categoriesQuery.error()?.message || 'مشکل ناشناخته')"></p-message>
+    } @else if (categoriesTree().length === 0) {
+      <p-message severity="warn" text="هیچ دسته‌بندی‌ای یافت نشد"></p-message>
+    } @else {
+      <p-tree
+        [value]="categoriesTree()"
+        [lazy]="false"
+        (onNodeSelect)="selectNode($event)"
+        selectionMode="single"
+      >
+        <ng-template let-node pTemplate="default">
+          <div class="node-content" [attr.aria-expanded]="node.expanded ? 'true' : 'false'" role="treeitem">
+            <span class="node-label">
+              @if (node.children && node.children.length) {
+                <i class="pi" [ngClass]="node.expanded ? 'pi-chevron-up' : 'pi-chevron-down'" (click)="toggleNode(node)" aria-label="باز و بسته کردن زیرمجموعه‌ها"></i>
+              }
+              {{ node.label }}
+            </span>
+          </div>
+        </ng-template>
+      </p-tree>
+    }
+  </div>
+</div> -->
+
+
 <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" class="form-container">
+  <!-- بخش دیباگ برای نمایش categories -->
+  <div>Debug categories: {{ categories() | json }}</div>
+
   <div class="form-group">
     <label for="name">نام دسته</label>
     <input pInputText id="name" formControlName="name" placeholder="نام دسته" aria-required="true" />
@@ -11,10 +48,10 @@
     <textarea pInputTextarea id="description" formControlName="description" class="form-textarea"
       placeholder="توضیحات"></textarea>
   </div>
-<p-select id="parentId" formControlName="parentId"
+  <p-select id="parentId" formControlName="parentId"
     [options]="categories()" optionLabel="label" optionValue="value"
     placeholder="انتخاب دسته والد" [showClear]="true">
-</p-select>
+  </p-select>
 
   <div class="form-group">
     <label>ویژگی جدید</label>

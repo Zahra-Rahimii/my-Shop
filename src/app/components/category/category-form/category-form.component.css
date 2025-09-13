@@ -161,3 +161,40 @@
   width: 2rem;
   height: 2rem;
 }
+
+
+
+/* .form-container {
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.tree-container {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.node-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.node-label {
+  flex-grow: 1;
+}
+
+.pi {
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+p-message {
+  margin-top: 10px;
+} */
+
