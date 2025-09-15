@@ -8,6 +8,7 @@ import { MessageService } from 'primeng/api';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideTanStackQuery, QueryClient} from '@tanstack/angular-query-experimental'
 
+
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
