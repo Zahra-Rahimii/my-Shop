@@ -24,14 +24,18 @@
         placeholder="نوع ویژگی" />
       <p-checkbox formControlName="required" label="اجباری" binary="true" aria-label="ویژگی اجباری"></p-checkbox>
       <button pButton type="button" label="اضافه کردن ویژگی" class="add-attribute-btn"
-        (click)="addAttribute()" [disabled]="!editMode()"></button>
+        (click)="addAttribute()"></button>
     </div>
     @if(categoryForm.get('attributeName')?.touched && categoryForm.get('attributeName')?.invalid) {
       <span class="error" role="alert">نام ویژگی اجباری است</span>
     }
   </div>
   @if(isLoadingAttributes()) {
-    <p-progressSpinner styleClass="custom-spinner" strokeWidth="4"></p-progressSpinner>
+    <div class="skeleton-attributes">
+      <p-skeleton width="100%" height="2rem" styleClass="mb-2"></p-skeleton>
+      <p-skeleton width="80%" height="2rem" styleClass="mb-2"></p-skeleton>
+      <p-skeleton width="90%" height="2rem"></p-skeleton>
+    </div>
   }
   @if(categoryAttributes().length || inheritedAttributes().length) {
     <div class="attributes-list">

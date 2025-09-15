@@ -11,7 +11,7 @@
         <div class="node-content" [attr.aria-expanded]="node.expanded ? 'true' : 'false'" role="treeitem">
           <span class="node-label">
             @if (node.children && node.children.length) {
-              <i class="pi" [ngClass]="node.expanded ? 'pi-chevron-up' : 'pi-chevron-down'" (click)="toggleNode(node)" aria-label="باز و بسته کردن زیرمجموعه‌ها"></i>
+              <i class="pi"  (click)="toggleNode(node)" aria-label="باز و بسته کردن زیرمجموعه‌ها"></i>
             }
             {{ node.label }}
           </span>

@@ -25,7 +25,7 @@ import { CategoryAttributeDTO } from '../../../models/attribute.model';
 export class CategoryTreeComponent {
   categories = signal<TreeNode[]>([]);
   nodeSelected = output<number | null>();
-  editNode = output<TreeNode>(); // اضافه کردن output جدید برای ویرایش
+  editNode = output<TreeNode>();
   isLoadingAttributes = signal(false);
   private categoryService = inject(CategoryService);
   private attributeService = inject(AttributeService);
@@ -35,10 +35,11 @@ export class CategoryTreeComponent {
 
   categoriesQuery = injectQuery(() => ({
     queryKey: ['categories'],
-queryFn: () => {
-    console.log('Running categoriesQuery with real API - Tree Component');
-    return lastValueFrom(this.categoryService.getCategories()).then(cats => this.mapCategoriesToTreeNodes(cats));
-  },    staleTime: 5 * 60 * 1000,
+    queryFn: () => {
+      console.log('Running categoriesQuery with real API - Tree Component');
+      return lastValueFrom(this.categoryService.getCategories()).then(cats => this.mapCategoriesToTreeNodes(cats));
+    },
+    staleTime: 5 * 60 * 1000,
     onSuccess: (data: TreeNode[]) => {
       console.log('onSuccess categoriesQuery - Tree Component, data length:', data.length);
       this.categories.set(data);
@@ -77,7 +78,6 @@ queryFn: () => {
     });
   }
 
-  // متد عمومی برای به‌روزرسانی دسته‌بندی‌ها
   refreshCategories() {
     this.queryClient.invalidateQueries({ queryKey: ['categories'] });
   }
@@ -104,7 +104,6 @@ queryFn: () => {
     this.nodeSelected.emit(id);
   }
 
-  // متد جدید برای ویرایش
   editCategory(node: TreeNode) {
     if (!node.data?.id) return;
     this.editNode.emit(node);
@@ -118,12 +117,19 @@ queryFn: () => {
   }
 
   loadAllInheritedAttributes(categoryId: number, collected: CategoryAttributeDTO[] = []): Promise<CategoryAttributeDTO[]> {
-    return lastValueFrom(this.categoryService.getCategory(categoryId)).then(category =>
-      lastValueFrom(this.attributeService.getCategoryAttributes(categoryId, false)).then(attrs => {
-        const merged = [...collected, ...attrs.map(attr => ({ ...attr, inherited: collected.length > 0 }))];
+    return lastValueFrom(this.categoryService.getCategory(categoryId)).then(category => {
+      const seenCategoryIds = new Set(collected.map(attr => attr.categoryId).filter(id => id !== undefined));
+      if (seenCategoryIds.has(categoryId)) {
+        return collected; // جلوگیری از حلقه
+      }
+      return lastValueFrom(this.attributeService.getCategoryAttributes(categoryId, false)).then(attrs => {
+        const seenAttributeIds = new Set(collected.map(attr => attr.attributeId));
+        const uniqueAttrs = attrs.filter(attr => !seenAttributeIds.has(attr.attributeId));
+        uniqueAttrs.forEach(attr => seenAttributeIds.add(attr.attributeId));
+        const merged = [...collected, ...uniqueAttrs.map(attr => ({ ...attr, inherited: collected.length > 0 }))];
         return category.parentId ? this.loadAllInheritedAttributes(category.parentId, merged) : merged;
-      })
-    );
+      });
+    });
   }
 
   showAttributesDialog(node: TreeNode) {
