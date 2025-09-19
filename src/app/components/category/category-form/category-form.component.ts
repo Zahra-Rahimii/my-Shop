@@ -11,10 +11,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SkeletonModule } from 'primeng/skeleton';
 import { injectQuery, injectMutation, injectQueryClient } from '@tanstack/angular-query-experimental';
 import { lastValueFrom } from 'rxjs';
-import { take } from 'rxjs/operators';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { take, distinctUntilChanged } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-
 import { Attribute, CategoryAttributeDTO, AttributeType } from '../../../models/attribute.model';
 import { Category, CategoryDTO, CategoryTreeNodeDTO } from '../../../models/category.model';
 import { CategoryService } from '../../../services/category.service';
@@ -47,13 +45,13 @@ export class CategoryFormComponent implements OnChanges {
     { label: 'عدد', value: AttributeType.NUMBER },
     { label: 'بولی', value: AttributeType.BOOLEAN },
     { label: 'انتخابی', value: AttributeType.SELECT },
-    { label: 'چند انتخابی', value: AttributeType.MULTISELECT }
+    { label: 'چند انتخابی', value: AttributeType.MULTISELECT },
   ]);
   categoryAttributes = signal<CategoryAttributeDTO[]>([]);
   inheritedAttributes = signal<CategoryAttributeDTO[]>([]);
   isLoadingAttributes = signal(false);
   editMode = signal(false);
-  
+
   private categoryService = inject(CategoryService);
   private attributeService = inject(AttributeService);
   private messageService = inject(MessageService);
@@ -68,7 +66,7 @@ export class CategoryFormComponent implements OnChanges {
       parentId: [null],
       attributeName: [''],
       attributeType: [null],
-      required: [false]
+      required: [false],
     });
 
     effect(() => {
@@ -77,9 +75,8 @@ export class CategoryFormComponent implements OnChanges {
         const flatCategories = this.flattenCategories(data);
         this.categories.set([
           { label: 'بدون والد', value: null },
-          ...flatCategories.map(cat => ({ label: cat.name, value: cat.id }))
+          ...flatCategories.map(cat => ({ label: cat.name, value: cat.id })),
         ]);
-        // Prefetch attributes for all categories
         flatCategories.forEach(cat => {
           if (cat.id) {
             this.queryClient.prefetchQuery({
@@ -98,7 +95,7 @@ export class CategoryFormComponent implements OnChanges {
         this.categoryForm.patchValue({
           name: category.name,
           description: category.description || '',
-          parentId: category.parentId || null
+          parentId: category.parentId || null,
         });
       }
     });
@@ -123,37 +120,30 @@ export class CategoryFormComponent implements OnChanges {
         this.isLoadingAttributes.set(false);
       }
     });
-     this.parentSub = this.categoryForm.get('parentId')?.valueChanges
-    .pipe(distinctUntilChanged())
-    .subscribe(async (parentId: number | null) => {
+
+    this.parentSub = this.categoryForm.get('parentId')?.valueChanges.pipe(distinctUntilChanged()).subscribe(async (parentId: number | null) => {
       const currentCategoryId = this.categoryId();
-      // حالت: ایجاد (editMode=false) یا وقتی categoryId موجود نباشه
       if (!parentId && !this.editMode()) {
         this.inheritedAttributes.set([]);
         this.isLoadingAttributes.set(false);
         return;
       }
-      // اگر والد انتخاب شد و در شرایطی هستیم که باید ارث‌بری رو لود کنیم:
       if (parentId && (!currentCategoryId || !this.editMode())) {
         this.isLoadingAttributes.set(true);
         try {
-          // fetchQuery فوراً اجرا می‌کنه و کش را هم استفاده می‌کند اگر موجود باشه
           const attrs = await this.queryClient.fetchQuery({
             queryKey: ['category-attributes', parentId],
             queryFn: () => this.loadInheritedAttributes(parentId),
             staleTime: 10 * 60 * 1000,
           }) as CategoryAttributeDTO[];
-
-          // جدا کردن ارث‌بری‌شده و محلی
           this.categoryAttributes.set(attrs.filter(a => !a.inherited));
           this.inheritedAttributes.set(attrs.filter(a => a.inherited));
         } catch (err) {
-          // پیام خطا (تو loadInheritedAttributes هم پیام گذاشتی ولی اضافه هم ضرری نداره)
           this.messageService.add({
             severity: 'error',
             summary: 'خطا',
             detail: 'خطا در بارگذاری ویژگی‌های والد: ' + ((err instanceof Error) ? err.message : 'نامشخص'),
-            life: 3000
+            life: 3000,
           });
         } finally {
           this.isLoadingAttributes.set(false);
@@ -172,19 +162,18 @@ export class CategoryFormComponent implements OnChanges {
       this.categoryAttributes.set([]);
       this.inheritedAttributes.set([]);
       this.messageService.clear();
-      this.messageService.add({ 
-        severity: 'info', 
-        summary: 'اطلاعات', 
-        detail: 'فرم برای ایجاد دسته جدید آماده شد', 
-        life: 3000 
+      this.messageService.add({
+        severity: 'info',
+        summary: 'اطلاعات',
+        detail: 'فرم برای ایجاد دسته جدید آماده شد',
+        life: 3000,
       });
     }
   }
 
   ngOnDestroy() {
-  this.parentSub?.unsubscribe();
-}
-
+    this.parentSub?.unsubscribe();
+  }
 
   private toPromise<T>(observable: any): Promise<T> {
     return lastValueFrom(observable.pipe(take(1))) as Promise<T>;
@@ -198,11 +187,11 @@ export class CategoryFormComponent implements OnChanges {
     gcTime: Infinity,
     keepPreviousData: true,
     onSuccess: () => {
-      this.messageService.add({ 
-        severity: 'success', 
-        summary: 'موفق', 
-        detail: 'دسته‌بندی‌ها با موفقیت لود شدند', 
-        life: 3000 
+      this.messageService.add({
+        severity: 'success',
+        summary: 'موفق',
+        detail: 'دسته‌بندی‌ها با موفقیت لود شدند',
+        life: 3000,
       });
     },
     onError: (error: Error) => {
@@ -210,9 +199,9 @@ export class CategoryFormComponent implements OnChanges {
         severity: 'error',
         summary: 'خطا',
         detail: 'خطا در بارگذاری دسته‌بندی‌ها: ' + (error.message || 'مشکل ناشناخته'),
-        life: 3000
+        life: 3000,
       });
-    }
+    },
   }));
 
   categoryQuery = injectQuery(() => ({
@@ -223,11 +212,11 @@ export class CategoryFormComponent implements OnChanges {
     gcTime: Infinity,
     keepPreviousData: true,
     onSuccess: () => {
-      this.messageService.add({ 
-        severity: 'success', 
-        summary: 'موفق', 
-        detail: 'دسته‌بندی با موفقیت لود شد', 
-        life: 3000 
+      this.messageService.add({
+        severity: 'success',
+        summary: 'موفق',
+        detail: 'دسته‌بندی با موفقیت لود شد',
+        life: 3000,
       });
     },
     onError: (error: Error) => {
@@ -235,9 +224,9 @@ export class CategoryFormComponent implements OnChanges {
         severity: 'error',
         summary: 'خطا',
         detail: 'خطا در بارگذاری دسته‌بندی: ' + (error.message || 'مشکل ناشناخته'),
-        life: 3000
+        life: 3000,
       });
-    }
+    },
   }));
 
   categoryAttributesQuery = injectQuery(() => ({
@@ -248,15 +237,14 @@ export class CategoryFormComponent implements OnChanges {
     gcTime: Infinity,
     keepPreviousData: true,
     onSuccess: (attrs: CategoryAttributeDTO[]) => {
-      this.categoryAttributes.set(attrs.filter(a => !a.inherited)); // محلی
-this.inheritedAttributes.set(attrs.filter(a => a.inherited)); // ارثی
-
+      this.categoryAttributes.set(attrs.filter(a => !a.inherited));
+      this.inheritedAttributes.set(attrs.filter(a => a.inherited));
       this.isLoadingAttributes.set(false);
-      this.messageService.add({ 
-        severity: 'success', 
-        summary: 'موفق', 
-        detail: 'ویژگی‌های دسته‌بندی با موفقیت لود شدند', 
-        life: 3000 
+      this.messageService.add({
+        severity: 'success',
+        summary: 'موفق',
+        detail: 'ویژگی‌های دسته‌بندی با موفقیت لود شدند',
+        life: 3000,
       });
     },
     onError: (error: Error) => {
@@ -265,14 +253,13 @@ this.inheritedAttributes.set(attrs.filter(a => a.inherited)); // ارثی
         severity: 'error',
         summary: 'خطا',
         detail: 'خطا در بارگذاری ویژگی‌های دسته‌بندی: ' + (error.message || 'مشکل ناشناخته'),
-        life: 3000
+        life: 3000,
       });
-    }
+    },
   }));
 
   addAttributeMutation = injectMutation(() => ({
-    mutationFn: (newAttribute: Attribute) => 
-      this.toPromise<Attribute>(this.attributeService.addAttribute(newAttribute)),
+    mutationFn: (newAttribute: Attribute) => this.toPromise<Attribute>(this.attributeService.addAttribute(newAttribute)),
     onSuccess: async (addedAttribute: Attribute) => {
       const newCatAttr: CategoryAttributeDTO = {
         id: 0,
@@ -282,7 +269,7 @@ this.inheritedAttributes.set(attrs.filter(a => a.inherited)); // ارثی
         attributeType: addedAttribute.type,
         required: this.categoryForm.get('required')?.value || false,
         categoryName: this.categoryForm.get('name')?.value || '',
-        inherited: false
+        inherited: false,
       };
       if (this.editMode()) {
         try {
@@ -295,7 +282,7 @@ this.inheritedAttributes.set(attrs.filter(a => a.inherited)); // ارثی
             severity: 'error',
             summary: 'خطا',
             detail: 'خطا در اضافه کردن ویژگی به دسته‌بندی',
-            life: 3000
+            life: 3000,
           });
           return;
         }
@@ -303,42 +290,40 @@ this.inheritedAttributes.set(attrs.filter(a => a.inherited)); // ارثی
         this.categoryAttributes.update(attrs => [...attrs, newCatAttr]);
       }
       this.categoryForm.patchValue({ attributeName: '', attributeType: null, required: false });
-      this.messageService.add({ 
-        severity: 'success', 
-        summary: 'موفق', 
-        detail: 'ویژگی با موفقیت اضافه شد', 
-        life: 3000 
+      this.messageService.add({
+        severity: 'success',
+        summary: 'موفق',
+        detail: 'ویژگی با موفقیت اضافه شد',
+        life: 3000,
       });
-    }
+    },
   }));
 
   removeAttributeMutation = injectMutation(() => ({
-    mutationFn: (attrId: number) => 
-      this.toPromise<void>(this.attributeService.deleteCategoryAttribute(attrId)),
+    mutationFn: (attrId: number) => this.toPromise<void>(this.attributeService.deleteCategoryAttribute(attrId)),
     onSuccess: (_, attrId) => {
       this.categoryAttributes.update(attrs => attrs.filter(attr => attr.id !== attrId));
-      this.messageService.add({ 
-        severity: 'success', 
-        summary: 'موفق', 
-        detail: 'ویژگی با موفقیت حذف شد', 
-        life: 3000 
+      this.messageService.add({
+        severity: 'success',
+        summary: 'موفق',
+        detail: 'ویژگی با موفقیت حذف شد',
+        life: 3000,
       });
-    }
+    },
   }));
 
   saveCategoryMutation = injectMutation(() => ({
-    mutationFn: (categoryDTO: CategoryDTO) => 
-      this.editMode() 
-        ? this.toPromise<Category>(this.categoryService.updateCategory(this.categoryId()!, categoryDTO))
-        : this.toPromise<Category>(this.categoryService.addCategory(categoryDTO)),
+    mutationFn: (categoryDTO: CategoryDTO) =>
+      this.editMode() ? this.toPromise<Category>(this.categoryService.updateCategory(this.categoryId()!, categoryDTO)) :
+        this.toPromise<Category>(this.categoryService.addCategory(categoryDTO)),
     onSuccess: (category: Category) => {
       const categoryId = category.id;
       if (!categoryId) {
-        this.messageService.add({ 
-          severity: 'error', 
-          summary: 'خطا', 
-          detail: 'شناسه دسته‌بندی معتبر نیست.', 
-          life: 3000 
+        this.messageService.add({
+          severity: 'error',
+          summary: 'خطا',
+          detail: 'شناسه دسته‌بندی معتبر نیست.',
+          life: 3000,
         });
         return;
       }
@@ -354,7 +339,7 @@ this.inheritedAttributes.set(attrs.filter(a => a.inherited)); // ارثی
             attributeType: attr.attributeType,
             required: attr.required,
             categoryName: category.name,
-            inherited: false
+            inherited: false,
           };
           return this.toPromise<CategoryAttributeDTO>(this.attributeService.addCategoryAttribute(categoryAttributeDTO));
         });
@@ -373,7 +358,7 @@ this.inheritedAttributes.set(attrs.filter(a => a.inherited)); // ارثی
             severity: 'error',
             summary: 'خطا',
             detail: 'خطا در ذخیره ویژگی‌ها',
-            life: 3000
+            life: 3000,
           });
         });
       } else {
@@ -385,135 +370,64 @@ this.inheritedAttributes.set(attrs.filter(a => a.inherited)); // ارثی
         this.queryClient.invalidateQueries({ queryKey: ['category', this.categoryId()] });
         this.queryClient.invalidateQueries({ queryKey: ['category-attributes', this.categoryId()] });
       }
-    }
+    },
   }));
 
+  private async loadInheritedAttributes(categoryId: number | null): Promise<CategoryAttributeDTO[]> {
+    if (!categoryId) return [];
+    let collected: CategoryAttributeDTO[] = [];
+    let currentId: number | null = categoryId;
+    const seenCategoryIds = new Set<number>();
 
-  // private async loadInheritedAttributes(categoryId: number | null): Promise<CategoryAttributeDTO[]> {
-  //   if (!categoryId) return [];
-  //   let collected: CategoryAttributeDTO[] = [];
-  //   let currentId: number | null = categoryId;
-  //   const seenCategoryIds = new Set<number>();
-  //   try {
-  //     const seenAttributeIds = new Set<number>();
-  //     const categoryIds: number[] = [];
-  //     while (currentId !== null && !seenCategoryIds.has(currentId)) {
-  //       seenCategoryIds.add(currentId);
-  //       categoryIds.push(currentId);
-  //       const category: Category = await this.queryClient.fetchQuery({
-  //         queryKey: ['category', currentId],
-  //         queryFn: () => this.toPromise<Category>(this.categoryService.getCategory(currentId!)),
-  //         staleTime: 10 * 60 * 1000,
-  //       });
-  //       currentId = category.parentId;
-  //     }
+    try {
+      const categoryIds: number[] = [];
+      while (currentId !== null && !seenCategoryIds.has(currentId)) {
+        seenCategoryIds.add(currentId);
+        categoryIds.push(currentId);
+        const category: Category = await this.queryClient.fetchQuery({
+          queryKey: ['category', currentId],
+          queryFn: () => this.toPromise<Category>(this.categoryService.getCategory(currentId!)),
+          staleTime: 10 * 60 * 1000,
+        });
+        currentId = category.parentId;
+      }
 
-  //     const attributePromises = categoryIds.map(id =>
-  //       this.queryClient.fetchQuery({
-  //         queryKey: ['category-attributes-local', id],
-  //         queryFn: () => this.toPromise<CategoryAttributeDTO[]>(this.attributeService.getCategoryAttributes(id, false)),
-  //         staleTime: 10 * 60 * 1000,
-  //       })
-  //     );
-  //     const attributeResults = await Promise.all(attributePromises);
+      categoryIds.reverse();
 
-  //     attributeResults.forEach((attrs, index) => {
-  //       const uniqueAttrs = attrs.filter(attr => !seenAttributeIds.has(attr.attributeId));
-  //       uniqueAttrs.forEach(attr => seenAttributeIds.add(attr.attributeId));
-  //       collected = [...uniqueAttrs.map(attr => ({ ...attr, inherited: index > 0 })), ...collected];
-  //     });
+      const attributeResults = await Promise.all(
+        categoryIds.map(id =>
+          this.queryClient.fetchQuery({
+            queryKey: ['category-attributes-local', id],
+            queryFn: () => this.toPromise<CategoryAttributeDTO[]>(this.attributeService.getCategoryAttributes(id, false)),
+            staleTime: 10 * 60 * 1000,
+          })
+        )
+      );
 
-  //     return collected;
-  //   } catch (error: unknown) {
-  //     this.messageService.add({
-  //       severity: 'error',
-  //       summary: 'خطا',
-  //       detail: 'خطا در بارگذاری ویژگی‌های ارث‌بری‌شده: ' + ((error instanceof Error) ? error.message : 'مشکل ناشناخته'),
-  //       life: 3000
-  //     });
-  //     return collected;
-  //   }
-  // }
-private async loadInheritedAttributes(categoryId: number | null): Promise<CategoryAttributeDTO[]> {
-  if (!categoryId) return [];
-  let collected: CategoryAttributeDTO[] = [];
-  let currentId: number | null = categoryId;
-  const seenCategoryIds = new Set<number>();
+      const seenAttributeIds = new Set<number>();
+      attributeResults.forEach((attrs, index) => {
+        const isInherited = index < attributeResults.length - 1;
+        const uniqueAttrs = attrs.filter(attr => !seenAttributeIds.has(attr.attributeId));
+        uniqueAttrs.forEach(attr => {
+          seenAttributeIds.add(attr.attributeId);
+          collected.push({
+            ...attr,
+            inherited: isInherited,
+          });
+        });
+      });
 
-  try {
-    const seenAttributeIds = new Set<number>();
-    const categoryIds: number[] = [];
-
-    // 1. جمع کردن تمام والدها تا ریشه
-while (currentId !== null && !seenCategoryIds.has(currentId)) {
-  seenCategoryIds.add(currentId);
-  categoryIds.push(currentId);
-  const category: Category = await this.queryClient.fetchQuery({
-    queryKey: ['category', currentId],
-    queryFn: () => this.toPromise<Category>(this.categoryService.getCategory(currentId!)),
-    staleTime: 10 * 60 * 1000,
-  });
-  currentId = category.parentId;
-}
-
-// برعکس کن → الان از ریشه به فرزند مرتب میشه
-categoryIds.reverse();
-
-    // 2. گرفتن همه ویژگی‌های هر دسته
-    const attributePromises = categoryIds.map(id =>
-      this.queryClient.fetchQuery({
-        queryKey: ['category-attributes-local', id],
-        queryFn: () => this.toPromise<CategoryAttributeDTO[]>(
-          this.attributeService.getCategoryAttributes(id, false)
-        ),
-        staleTime: 10 * 60 * 1000,
-      })
-    );
-
-    const attributeResults = await Promise.all(
-  categoryIds.map(id =>
-    this.queryClient.fetchQuery({
-      queryKey: ['category-attributes-local', id],
-      queryFn: () => this.toPromise<CategoryAttributeDTO[]>(
-        this.attributeService.getCategoryAttributes(id, false)
-      ),
-      staleTime: 10 * 60 * 1000,
-    })
-  )
-);
-
-attributeResults.forEach((attrs, index) => {
-  const isInherited = index < attributeResults.length - 1; 
-  const uniqueAttrs = attrs.filter(attr => !seenAttributeIds.has(attr.attributeId));
-
-  uniqueAttrs.forEach(attr => {
-    seenAttributeIds.add(attr.attributeId);
-    collected.push({
-      ...attr,
-      inherited: isInherited
-    });
-  });
-});
-
-console.log('--- loadInheritedAttributes ---');
-console.table(collected.map(c => ({
-  name: c.attributeName,
-  type: c.attributeType,
-  inherited: c.inherited,
-  categoryId: c.categoryId
-})));
-
-    return collected;
-  } catch (error: unknown) {
-    this.messageService.add({
-      severity: 'error',
-      summary: 'خطا',
-      detail: 'خطا در بارگذاری ویژگی‌های ارث‌بری‌شده: ' + ((error instanceof Error) ? error.message : 'مشکل ناشناخته'),
-      life: 3000
-    });
-    return collected;
+      return collected;
+    } catch (error: unknown) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'خطا',
+        detail: 'خطا در بارگذاری ویژگی‌های ارث‌بری‌شده: ' + ((error instanceof Error) ? error.message : 'نامشخص'),
+        life: 3000,
+      });
+      return collected;
+    }
   }
-}
 
   private flattenCategories(nodes: CategoryTreeNodeDTO[]): Category[] {
     if (!nodes || !Array.isArray(nodes)) return [];
@@ -530,7 +444,7 @@ console.table(collected.map(c => ({
         name: node.label || 'بدون نام',
         description: node.data.description || '',
         parentId: node.data.parentId || null,
-        children: []
+        children: [],
       };
       result.push(category);
       if (node.children && node.children.length > 0) {
@@ -551,24 +465,24 @@ console.table(collected.map(c => ({
     const required = this.categoryForm.get('required')?.value;
 
     if (!attributeName || !attributeType) {
-      this.messageService.add({ 
-        severity: 'warn', 
-        summary: 'هشدار', 
-        detail: 'نام و نوع ویژگی اجباری است', 
-        life: 3000 
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'هشدار',
+        detail: 'نام و نوع ویژگی اجباری است',
+        life: 3000,
       });
       return;
     }
 
-    const existingAttribute = this.categoryAttributes().find(attr => 
+    const existingAttribute = this.categoryAttributes().find(attr =>
       attr.attributeName.toLowerCase() === attributeName.toLowerCase()
     );
     if (existingAttribute) {
-      this.messageService.add({ 
-        severity: 'warn', 
-        summary: 'هشدار', 
-        detail: 'ویژگی با این نام قبلاً اضافه شده است', 
-        life: 3000 
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'هشدار',
+        detail: 'ویژگی با این نام قبلاً اضافه شده است',
+        life: 3000,
       });
       return;
     }
@@ -576,9 +490,9 @@ console.table(collected.map(c => ({
     const newAttribute: Attribute = {
       id: 0,
       name: attributeName,
-      type: attributeType
+      type: attributeType,
     };
-    
+
     this.addAttributeMutation.mutate(newAttribute);
   }
 
@@ -588,32 +502,32 @@ console.table(collected.map(c => ({
       this.removeAttributeMutation.mutate(attr.id);
     } else {
       this.categoryAttributes.update(attrs => attrs.filter((_, i) => i !== index));
-      this.messageService.add({ 
-        severity: 'success', 
-        summary: 'موفق', 
-        detail: 'ویژگی با موفقیت حذف شد', 
-        life: 3000 
+      this.messageService.add({
+        severity: 'success',
+        summary: 'موفق',
+        detail: 'ویژگی با موفقیت حذف شد',
+        life: 3000,
       });
     }
   }
 
   onSubmit() {
     if (!this.categoryForm.get('name')?.valid) {
-      this.messageService.add({ 
-        severity: 'warn', 
-        summary: 'هشدار', 
-        detail: 'نام دسته اجباری است', 
-        life: 3000 
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'هشدار',
+        detail: 'نام دسته اجباری است',
+        life: 3000,
       });
       return;
     }
 
     if (this.categoryAttributes().length + this.inheritedAttributes().length === 0) {
-      this.messageService.add({ 
-        severity: 'warn', 
-        summary: 'هشدار', 
-        detail: 'حداقل یک ویژگی باید اضافه شود', 
-        life: 3000 
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'هشدار',
+        detail: 'حداقل یک ویژگی باید اضافه شود',
+        life: 3000,
       });
       return;
     }
@@ -621,27 +535,26 @@ console.table(collected.map(c => ({
     const categoryDTO: CategoryDTO = {
       name: this.categoryForm.get('name')?.value,
       description: this.categoryForm.get('description')?.value || '',
-      parentId: this.categoryForm.get('parentId')?.value || null
+      parentId: this.categoryForm.get('parentId')?.value || null,
     };
 
     this.saveCategoryMutation.mutate(categoryDTO);
   }
 
-private finalizeSubmission(category: Category) {
-  const wasEdit = this.editMode();
-  this.categoryUpdated.emit();
-  this.categoryForm.reset();
-  this.categoryAttributes.set([]);
-  this.inheritedAttributes.set([]);
-  this.editMode.set(false);
-  this.messageService.add({
-    severity: 'success',
-    summary: 'موفق',
-    detail: `دسته‌بندی "${category.name}" با موفقیت ${wasEdit ? 'ویرایش' : 'ایجاد'} شد`,
-    life: 3000
-  });
-}
-
+  private finalizeSubmission(category: Category) {
+    const wasEdit = this.editMode();
+    this.categoryUpdated.emit();
+    this.categoryForm.reset();
+    this.categoryAttributes.set([]);
+    this.inheritedAttributes.set([]);
+    this.editMode.set(false);
+    this.messageService.add({
+      severity: 'success',
+      summary: 'موفق',
+      detail: `دسته‌بندی "${category.name}" با موفقیت ${wasEdit ? 'ویرایش' : 'ایجاد'} شد`,
+      life: 3000,
+    });
+  }
 
   trackByAttribute(_: number, attr: CategoryAttributeDTO): number {
     return attr.id;

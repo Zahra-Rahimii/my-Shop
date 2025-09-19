@@ -8,12 +8,11 @@ import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
 import { injectQuery, injectMutation, injectQueryClient } from '@tanstack/angular-query-experimental';
 import { lastValueFrom } from 'rxjs';
-
 import { CategoryService } from '../../../services/category.service';
 import { AttributeService } from '../../../services/attribute.service';
 import { CategoryTreeNodeDTO } from '../../../models/category.model';
 import { CategoryAttributeDTO } from '../../../models/attribute.model';
-import { Message } from "primeng/message";
+import { Message } from 'primeng/message';
 
 @Component({
   selector: 'app-category-tree',
@@ -36,13 +35,9 @@ export class CategoryTreeComponent {
 
   categoriesQuery = injectQuery(() => ({
     queryKey: ['categories'],
-    queryFn: () => {
-      console.log('Running categoriesQuery with real API - Tree Component');
-      return lastValueFrom(this.categoryService.getCategories()).then(cats => this.mapCategoriesToTreeNodes(cats));
-    },
+    queryFn: () => lastValueFrom(this.categoryService.getCategories()).then(cats => this.mapCategoriesToTreeNodes(cats)),
     staleTime: 5 * 60 * 1000,
     onSuccess: (data: TreeNode[]) => {
-      console.log('onSuccess categoriesQuery - Tree Component, data length:', data.length);
       this.categories.set(data);
       this.messageService.add({ severity: 'success', summary: 'موفق', detail: 'دسته‌بندی‌ها با موفقیت لود شدند', life: 3000 });
     },
@@ -72,7 +67,6 @@ export class CategoryTreeComponent {
   constructor() {
     effect(() => {
       const data = this.categoriesQuery.data();
-      console.log('Effect triggered in Tree Component, data length:', data?.length);
       if (data) {
         this.categories.set(data);
       }
@@ -121,7 +115,7 @@ export class CategoryTreeComponent {
     return lastValueFrom(this.categoryService.getCategory(categoryId)).then(category => {
       const seenCategoryIds = new Set(collected.map(attr => attr.categoryId).filter(id => id !== undefined));
       if (seenCategoryIds.has(categoryId)) {
-        return collected; // جلوگیری از حلقه
+        return collected;
       }
       return lastValueFrom(this.attributeService.getCategoryAttributes(categoryId, false)).then(attrs => {
         const seenAttributeIds = new Set(collected.map(attr => attr.attributeId));

@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { DropdownModule } from 'primeng/dropdown'; // جایگزین SelectModule
+import { DropdownModule } from 'primeng/dropdown';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TableModule } from 'primeng/table';
 import { MessageService } from 'primeng/api';
@@ -27,7 +27,7 @@ import { Category } from '../../../models/category.model';
     ProgressSpinnerModule,
     ButtonModule,
     InputTextModule,
-    DropdownModule, // اصلاح به DropdownModule
+    DropdownModule,
     CheckboxModule,
     TableModule,
   ],
@@ -78,7 +78,6 @@ export class CategoryAttributesComponent {
   try {
     const categoryChain: Category[] = [];
 
-    // مرحله ۱: جمع کردن همه والدها تا ریشه
     let currentId: number | null = categoryId;
     const seenCategoryIds = new Set<number>();
 
@@ -93,10 +92,8 @@ export class CategoryAttributesComponent {
       currentId = category.parentId;
     }
 
-    // برعکس کن: حالا ترتیب ریشه تا فرزند داریم
     categoryChain.reverse();
 
-    // مرحله ۲: گرفتن ویژگی‌ها و برچسب‌گذاری inherited
     const seenAttributeIds = new Set<number>();
     const collected: CategoryAttributeDTO[] = [];
 
@@ -115,16 +112,13 @@ export class CategoryAttributesComponent {
   categoryId: cat.id!,
   categoryName: cat.name
 });
-
         }
       });
     }
 
-    console.log('Final collected attributes:', collected);
     return collected;
 
   } catch (error: unknown) {
-    console.error(`Error fetching attributes for category ${categoryId}:`, error);
     this.messageService.add({
       severity: 'error',
       summary: 'خطا',
@@ -143,7 +137,6 @@ export class CategoryAttributesComponent {
       enabled: !!categoryId,
       staleTime: 5 * 60 * 1000,
       onSuccess: (data: CategoryAttributeDTO[]) => {
-        console.log('Query success, final attributes:', data);
         this.messageService.add({
           severity: 'success',
           summary: 'موفق',
@@ -152,7 +145,6 @@ export class CategoryAttributesComponent {
         });
       },
       onError: (error: Error) => {
-        console.error('Query error:', error);
         this.messageService.add({
           severity: 'error',
           summary: 'خطا',
@@ -183,7 +175,7 @@ export class CategoryAttributesComponent {
           this.attributeService.addCategoryAttribute(newCatAttr)
         );
         this.queryClient.invalidateQueries({ queryKey: ['category-attributes', categoryId] });
-        this.queryClient.invalidateQueries({ queryKey: ['categories'] }); // برای تازه کردن درخت
+        this.queryClient.invalidateQueries({ queryKey: ['categories'] });
         this.queryClient.invalidateQueries({ queryKey: ['category-attributes', this.route.snapshot.paramMap.get('id')] });
         this.attributeForm.reset();
         this.messageService.add({
@@ -193,7 +185,6 @@ export class CategoryAttributesComponent {
           life: 3000,
         });
       } catch (error) {
-        console.error('Error adding category attribute:', error);
         this.messageService.add({
           severity: 'error',
           summary: 'خطا',
@@ -203,7 +194,6 @@ export class CategoryAttributesComponent {
       }
     },
     onError: (error: Error) => {
-      console.error('Error adding attribute:', error);
       this.messageService.add({
         severity: 'error',
         summary: 'خطا',
@@ -226,7 +216,6 @@ export class CategoryAttributesComponent {
       });
     },
     onError: (error: Error) => {
-      console.error('Error deleting attribute:', error);
       this.messageService.add({
         severity: 'error',
         summary: 'خطا',
@@ -308,7 +297,7 @@ export class CategoryAttributesComponent {
   if (!this.node?.data?.attributes) return [];
   return [...this.node.data.attributes].sort((a, b) => {
     if (a.inherited === b.inherited) return 0;
-    return a.inherited ? 1 : -1; // غیرارثی (false) اول، ارثی (true) بعد
+    return a.inherited ? 1 : -1;
   });
 }
 
