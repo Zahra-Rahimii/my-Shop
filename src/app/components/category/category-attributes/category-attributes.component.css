@@ -1,38 +1,20 @@
-.attributes-container {
-  max-width: 800px;
-  margin: 0 auto;
+:host {
+  display: block;
+  margin-top: 5rem;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.p-checkbox .p-checkbox-box {
+  @apply border-neutral-200 dark:border-neutral-600;
 }
 
-.form-container {
-  background-color: #ffffff;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.p-checkbox .p-checkbox-box.p-highlight {
+  @apply bg-primary-500 border-primary-500 dark:bg-primary-600 dark:border-primary-600;
 }
 
-.error {
-  color: #ef4444;
-  text-align: center;
-  margin-top: 20px;
+.p-table {
+  @apply rounded-xl;
 }
 
-.no-attributes {
-  text-align: center;
-  color: #6b7280;
-  margin-top: 20px;
-}
-
-.p-datatable .p-datatable-thead > tr > th {
-  background-color: #f8fafc;
-  font-weight: 600;
-}
-
-.p-datatable .p-datatable-tbody > tr:hover {
-  background-color: #f1f5f9;
+.p-table th, .p-table td {
+  @apply border-b border-neutral-200 dark:border-neutral-700;
 }

@@ -1,80 +1,24 @@
-.container {
-  padding: 1rem;
-  max-width: 100%;
-  box-sizing: border-box;
+:host {
+  display: block;
+  margin-top: 5rem;
 }
 
-.tree-container {
-  background: #ffffff;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #9ca3af;
-  color: #1e293b;
-  position: relative;
+.p-tree {
+  @apply rounded-xl;
 }
 
-.node-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem;
-  background: #f8fafc;
-  border-radius: 6px;
-  transition: background 0.2s ease;
+.p-tree .p-treenode-content {
+  @apply border-b border-neutral-200 dark:border-neutral-700 last:border-b-0;
 }
 
-.node-content:hover {
-  background: #e2e8f0;
+.p-tree .p-treenode-content:hover {
+  @apply bg-neutral-50 dark:bg-neutral-700;
 }
 
-.node-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #1e293b;
+.p-tree .p-treenode-label {
+  @apply text-neutral-700 dark:text-neutral-100;
 }
 
-.node-label .pi {
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: #4b5563;
-  transition: color 0.2s ease;
-}
-
-.node-label .pi:hover,
-.node-label .pi:focus {
-  color: #60a5fa;
-  outline: 2px solid #60a5fa;
-  outline-offset: 2px;
-}
-
-@media (max-width: 600px) {
-  .container {
-    padding: 0.5rem;
-  }
-
-  .tree-container {
-    padding: 0.5rem;
-  }
-
-  .node-content {
-    padding: 0.5rem;
-    font-size: 0.9rem;
-  }
-
-  .node-label {
-    font-size: 0.85rem;
-  }
-
-  .node-actions {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .show-attributes-btn {
-    padding: 0.5rem;
-    font-size: 0.8rem;
-  }
+.p-progressSpinner {
+  @apply w-8 h-8;
 }

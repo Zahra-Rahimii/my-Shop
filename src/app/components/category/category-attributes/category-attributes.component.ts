@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
+import { DropdownModule } from 'primeng/dropdown'; // جایگزین SelectModule
 import { CheckboxModule } from 'primeng/checkbox';
 import { TableModule } from 'primeng/table';
 import { MessageService } from 'primeng/api';
@@ -13,7 +13,6 @@ import { TreeNode } from 'primeng/api';
 import { injectQuery, injectMutation, injectQueryClient } from '@tanstack/angular-query-experimental';
 import { lastValueFrom } from 'rxjs';
 import { take } from 'rxjs/operators';
-
 import { CategoryService } from '../../../services/category.service';
 import { AttributeService } from '../../../services/attribute.service';
 import { CategoryAttributeDTO, Attribute, AttributeType } from '../../../models/attribute.model';
@@ -28,7 +27,7 @@ import { Category } from '../../../models/category.model';
     ProgressSpinnerModule,
     ButtonModule,
     InputTextModule,
-    SelectModule,
+    DropdownModule, // اصلاح به DropdownModule
     CheckboxModule,
     TableModule,
   ],
@@ -75,42 +74,66 @@ export class CategoryAttributesComponent {
     return lastValueFrom(observable.pipe(take(1))) as Promise<T>;
   }
 
-  private async fetchAllInheritedAttributes(categoryId: number, collected: CategoryAttributeDTO[] = [], isRoot: boolean = true): Promise<CategoryAttributeDTO[]> {
-    try {
-      const category: Category = await this.toPromise(this.categoryService.getCategory(categoryId));
-      console.log(`Fetching attributes for category: ${categoryId} (${category.name}), isRoot: ${isRoot}`);
-      const seenCategoryIds = new Set(collected.map(attr => attr.categoryId).filter(id => id !== undefined));
-      if (seenCategoryIds.has(categoryId)) {
-        console.log(`Cycle detected for category: ${categoryId}, stopping recursion`);
-        return collected;
-      }
-      const attrs = await this.toPromise(this.attributeService.getCategoryAttributes(categoryId)) as CategoryAttributeDTO[];
-      console.log(`Attributes for category ${categoryId}:`, attrs);
-      const seenAttributeIds = new Set(collected.map(attr => attr.attributeId));
-      const uniqueAttrs = attrs
-        .filter((attr: { attributeId: number; }) => !seenAttributeIds.has(attr.attributeId))
-        .map((attr: any) => ({
-          ...attr,
-          inherited: !isRoot,
-          inheritedFrom: !isRoot ? category.name : undefined,
-          categoryId, // اطمینان از تنظیم categoryId درست
-        }));
-      uniqueAttrs.forEach((attr: { attributeId: number; }) => seenAttributeIds.add(attr.attributeId));
-      // ویژگی‌های دسته فعلی اول، سپس ویژگی‌های والدها
-      const merged = isRoot ? [...uniqueAttrs, ...collected] : [...collected, ...uniqueAttrs];
-      console.log(`Merged attributes for category ${categoryId}:`, merged);
-      return category.parentId ? this.fetchAllInheritedAttributes(category.parentId, merged, false) : merged;
-    } catch (error: unknown) {
-      console.error(`Error fetching attributes for category ${categoryId}:`, error);
-      this.messageService.add({
-        severity: 'error',
-        summary: 'خطا',
-        detail: 'خطا در بارگذاری ویژگی‌های ارث‌بری‌شده: ' + ((error instanceof Error) ? error.message : 'مشکل ناشناخته'),
-        life: 3000,
-      });
-      return collected;
+  private async fetchAllInheritedAttributes(categoryId: number): Promise<CategoryAttributeDTO[]> {
+  try {
+    const categoryChain: Category[] = [];
+
+    // مرحله ۱: جمع کردن همه والدها تا ریشه
+    let currentId: number | null = categoryId;
+    const seenCategoryIds = new Set<number>();
+
+    while (currentId !== null && !seenCategoryIds.has(currentId)) {
+      seenCategoryIds.add(currentId);
+
+      const category: Category = await this.toPromise<Category>(
+        this.categoryService.getCategory(currentId)
+      );
+
+      categoryChain.push(category);
+      currentId = category.parentId;
     }
+
+    // برعکس کن: حالا ترتیب ریشه تا فرزند داریم
+    categoryChain.reverse();
+
+    // مرحله ۲: گرفتن ویژگی‌ها و برچسب‌گذاری inherited
+    const seenAttributeIds = new Set<number>();
+    const collected: CategoryAttributeDTO[] = [];
+
+    for (let i = 0; i < categoryChain.length; i++) {
+      const cat = categoryChain[i];
+      const attrs = await this.toPromise<CategoryAttributeDTO[]>(
+        this.attributeService.getCategoryAttributes(cat.id!)
+      );
+
+      attrs.forEach(attr => {
+        if (!seenAttributeIds.has(attr.attributeId)) {
+          seenAttributeIds.add(attr.attributeId);
+          collected.push({
+  ...attr,
+  inherited: i < categoryChain.length - 1,
+  categoryId: cat.id!,
+  categoryName: cat.name
+});
+
+        }
+      });
+    }
+
+    console.log('Final collected attributes:', collected);
+    return collected;
+
+  } catch (error: unknown) {
+    console.error(`Error fetching attributes for category ${categoryId}:`, error);
+    this.messageService.add({
+      severity: 'error',
+      summary: 'خطا',
+      detail: 'خطا در بارگذاری ویژگی‌های ارث‌بری‌شده: ' + ((error instanceof Error) ? error.message : 'نامشخص'),
+      life: 3000
+    });
+    return [];
   }
+}
 
   query = injectQuery(() => {
     const categoryId = this.route.snapshot.paramMap.get('id');
@@ -120,7 +143,7 @@ export class CategoryAttributesComponent {
       enabled: !!categoryId,
       staleTime: 5 * 60 * 1000,
       onSuccess: (data: CategoryAttributeDTO[]) => {
-        console.log('Query success, attributes:', data);
+        console.log('Query success, final attributes:', data);
         this.messageService.add({
           severity: 'success',
           summary: 'موفق',
@@ -159,6 +182,8 @@ export class CategoryAttributesComponent {
         await this.toPromise<CategoryAttributeDTO>(
           this.attributeService.addCategoryAttribute(newCatAttr)
         );
+        this.queryClient.invalidateQueries({ queryKey: ['category-attributes', categoryId] });
+        this.queryClient.invalidateQueries({ queryKey: ['categories'] }); // برای تازه کردن درخت
         this.queryClient.invalidateQueries({ queryKey: ['category-attributes', this.route.snapshot.paramMap.get('id')] });
         this.attributeForm.reset();
         this.messageService.add({
@@ -252,7 +277,7 @@ export class CategoryAttributesComponent {
     };
 
     const existingAttribute = this.node?.data?.attributes?.find(
-      (      attr: { attributeName: string; }) => attr.attributeName.toLowerCase() === newAttribute.name.toLowerCase()
+      (attr: { attributeName: string }) => attr.attributeName.toLowerCase() === newAttribute.name.toLowerCase()
     );
     if (existingAttribute) {
       this.messageService.add({
@@ -278,4 +303,13 @@ export class CategoryAttributesComponent {
   trackByAttribute(_: number, attr: CategoryAttributeDTO) {
     return attr.id;
   }
+
+  get sortedAttributes(): CategoryAttributeDTO[] {
+  if (!this.node?.data?.attributes) return [];
+  return [...this.node.data.attributes].sort((a, b) => {
+    if (a.inherited === b.inherited) return 0;
+    return a.inherited ? 1 : -1; // غیرارثی (false) اول، ارثی (true) بعد
+  });
+}
+
 }

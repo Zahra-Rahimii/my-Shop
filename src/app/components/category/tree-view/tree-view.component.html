@@ -1,77 +1,38 @@
-<!-- <div class="container">
-  <div class="tree-container">
-    <p-tree
-      [value]="categories()"
-      [lazy]="true"
-      (onNodeExpand)="loadNode($event)"
-      (onNodeSelect)="selectNode($event)"
-      selectionMode="single"
-    >
-      <ng-template let-node pTemplate="default">
-        <div class="node-content" [attr.aria-expanded]="node.expanded ? 'true' : 'false'" role="treeitem">
-          <span class="node-label">
-            @if (node.children && node.children.length) {
-              <i class="pi" [ngClass]="node.expanded ? 'pi-chevron-up' : 'pi-chevron-down'" (click)="toggleNode(node)" aria-label="باز و بسته کردن زیرمجموعه‌ها"></i>
-            }
-            {{ node.label }}
-          </span>
-          <div class="node-actions">
-            <button
-              pButton
-              type="button"
-              icon="pi pi-list"
-              class="show-attributes-btn"
-              (click)="showAttributesDialog(node)"
-              title="نمایش ویژگی‌ها"
-              [disabled]="!node.data?.id || isLoadingAttributes()"
-              aria-label="نمایش ویژگی‌های دسته‌بندی"
-            ></button>
-          </div>
-        </div>
-      </ng-template>
-    </p-tree>
-    @if (isLoadingAttributes()) {
-      <p-progressSpinner aria-label="در حال بارگذاری ویژگی‌ها"></p-progressSpinner>
-    }
-  </div>
-</div> -->
-
-
-<div class="container">
-  <div class="tree-container">
-    <!-- اضافه کردن وضعیت‌های مختلف برای نمایش به کاربر -->
+<div class="p-6 max-w-full mx-auto dir=rtl animate-fade-in">
+  <div class="card relative">
     @if (categoriesQuery.isLoading()) {
-      <div class="loading-container">
-        <p-progressSpinner aria-label="در حال بارگذاری دسته‌بندی‌ها"></p-progressSpinner>
-        <p>در حال بارگذاری دسته‌بندی‌ها...</p>
+      <div class="flex flex-col items-center gap-4 p-8">
+        <p-progressSpinner class="w-8 h-8 animate-pulse" aria-label="در حال بارگذاری دسته‌بندی‌ها"></p-progressSpinner>
+        <span class="text-neutral-600 dark:text-neutral-200 text-sm font-medium">در حال بارگذاری دسته‌بندی‌ها...</span>
       </div>
-    }
-    @if (categoriesQuery.isError()) {
-      <p-message severity="error" text="خطا در بارگذاری دسته‌بندی‌ها"></p-message>
-      <button pButton type="button" icon="pi pi-refresh" (click)="refreshCategories()" label="تلاش مجدد"></button>
-    }
-    @if (categoriesQuery.isSuccess()) {
+    } @else if (categoriesQuery.isError()) {
+      <div class="card text-center p-6 animate-fade-in">
+        <p-message severity="error" text="خطا در بارگذاری دسته‌بندی‌ها" class="mb-4 rounded-xl"></p-message>
+        <button pButton type="button" icon="pi pi-refresh" class="btn-primary px-4 py-2" (click)="refreshCategories()" label="تلاش مجدد" aria-label="تلاش مجدد برای بارگذاری دسته‌بندی‌ها"></button>
+      </div>
+    } @else if (categoriesQuery.isSuccess()) {
       <p-tree
         [value]="categories()"
         [lazy]="true"
         (onNodeExpand)="loadNode($event)"
         (onNodeSelect)="selectNode($event)"
         selectionMode="single"
+        class="w-full"
       >
         <ng-template let-node pTemplate="default">
-          <div class="node-content" [attr.aria-expanded]="node.expanded ? 'true' : 'false'" role="treeitem">
-            <span class="node-label">
+          <div class="node-content flex justify-between items-center p-3 bg-neutral-50 rounded-xl mb-2 hover:bg-neutral-100 dark:bg-neutral-800 dark:hover:bg-neutral-700 transition-all duration-200 cursor-pointer" [attr.aria-expanded]="node.expanded ? 'true' : 'false'" role="treeitem">
+            <span class="node-label flex items-center gap-2 text-sm font-medium text-neutral-700 dark:text-neutral-100 flex-1">
               @if (node.children && node.children.length) {
-                <i class="pi" (click)="toggleNode(node)" aria-label="باز و بسته کردن زیرمجموعه‌ها"></i>
+                <i class="pi pi-chevron-down text-neutral-500 hover:text-primary-400 cursor-pointer transition-colors duration-200 dark:text-neutral-200 dark:hover:text-primary-400" (click)="toggleNode(node)" aria-label="باز و بسته کردن زیرمجموعه‌ها"></i>
               }
-              {{ node.label }}
+              <span class="truncate">{{ node.label }}</span>
             </span>
-            <div class="node-actions">
+            <div class="node-actions flex gap-2 ms-2">
               <button
                 pButton
                 type="button"
                 icon="pi pi-list"
-                class="show-attributes-btn"
+                class="btn-text p-2 hover:bg-primary-100 dark:hover:bg-primary-900 transition-all duration-200"
                 (click)="showAttributesDialog(node)"
                 title="نمایش ویژگی‌ها"
                 [disabled]="!node.data?.id || isLoadingAttributes()"
@@ -83,7 +44,9 @@
       </p-tree>
     }
     @if (isLoadingAttributes()) {
-      <p-progressSpinner aria-label="در حال بارگذاری ویژگی‌ها"></p-progressSpinner>
+      <div class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 rounded-xl dark:bg-neutral-900 dark:bg-opacity-75 z-10">
+        <p-progressSpinner class="w-8 h-8 animate-pulse" aria-label="در حال بارگذاری ویژگی‌ها"></p-progressSpinner>
+      </div>
     }
   </div>
 </div>

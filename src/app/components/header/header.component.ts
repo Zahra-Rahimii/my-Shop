@@ -5,16 +5,18 @@ import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { MenubarModule } from 'primeng/menubar';
 import { MenuItem } from 'primeng/api';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [ToolbarModule, ButtonModule, AvatarModule, MenubarModule],
+  imports: [ToolbarModule, ButtonModule, AvatarModule, MenubarModule, CommonModule],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HeaderComponent {
+  isDarkMode = false;
   items: MenuItem[] = [
     {
       label: 'خانه',
@@ -70,5 +72,10 @@ export class HeaderComponent {
 
   navigateTo(route: string) {
     this.router.navigate([route]);
+  }
+
+  toggleDarkMode() {
+    this.isDarkMode = !this.isDarkMode;
+    document.documentElement.classList.toggle('dark');
   }
 }

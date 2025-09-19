@@ -13,11 +13,12 @@ import { CategoryService } from '../../../services/category.service';
 import { AttributeService } from '../../../services/attribute.service';
 import { CategoryTreeNodeDTO } from '../../../models/category.model';
 import { CategoryAttributeDTO } from '../../../models/attribute.model';
+import { Message } from "primeng/message";
 
 @Component({
   selector: 'app-category-tree',
   standalone: true,
-  imports: [CommonModule, TreeModule, ButtonModule, ProgressSpinnerModule],
+  imports: [CommonModule, TreeModule, ButtonModule, ProgressSpinnerModule, Message],
   templateUrl: './category-tree.component.html',
   styleUrls: ['./category-tree.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,

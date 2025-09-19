@@ -1,4 +1,24 @@
 .p-menubar {
-  border-bottom: 1px solid #9ca3af;
+  direction: rtl;
+  @apply w-full py-2 px-4 sm:px-6; /* فاصله بیشتر در دسکتاپ */
 }
 
+.p-avatar {
+  @apply transition-transform duration-200 hover:scale-110 sm:scale-100; /* غیرفعال کردن scale در موبایل */
+  width: 2.5rem; /* اندازه پیش‌فرض */
+  height: 2.5rem;
+}
+
+@media (max-width: 640px) {
+  .p-avatar {
+    @apply w-8 h-8; /* کوچکتر کردن آواتار در موبایل */
+  }
+
+  .btn-text {
+    @apply px-2 py-1; /* کاهش فاصله دکمه در موبایل */
+  }
+
+  .p-menubar .p-submenu-list {
+    @apply min-w-[10rem]; /* کاهش عرض زیرمنو در موبایل */
+  }
+}
