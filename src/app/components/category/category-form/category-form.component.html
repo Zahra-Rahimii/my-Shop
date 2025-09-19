@@ -53,7 +53,10 @@
         optionValue="value"
         placeholder="انتخاب دسته والد"
         [showClear]="true"
-        class="dropdown"
+        [filter]="true" 
+        filterBy="label"
+        filterMatchMode="contains"
+        class="dropdown w-full" 
       ></p-dropdown>
     </div>
     <div class="space-y-2">

@@ -51,6 +51,7 @@ export class CategoryFormComponent implements OnChanges {
   inheritedAttributes = signal<CategoryAttributeDTO[]>([]);
   isLoadingAttributes = signal(false);
   editMode = signal(false);
+  
 
   private categoryService = inject(CategoryService);
   private attributeService = inject(AttributeService);
