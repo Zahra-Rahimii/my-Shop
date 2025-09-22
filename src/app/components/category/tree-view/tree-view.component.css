@@ -1,24 +1,33 @@
 :host {
   display: block;
-  margin-top: 5rem;
+  margin-top: 7rem;
 }
 
-.p-tree {
-  @apply rounded-xl;
+:host {
+  display: block;
 }
 
-.p-tree .p-treenode-content {
-  @apply border-b border-neutral-200 dark:border-neutral-700 last:border-b-0;
+:host ::ng-deep .p-button.p-component.btn-danger {
+  @apply bg-gradient-to-r from-danger-300 to-danger-200 text-white border border-danger-300 rounded-xl font-medium px-4 py-2 transition-all duration-300 hover:from-danger-600 hover:to-danger-500 hover:border-danger-600 hover:shadow-md hover:scale-102 focus:ring-4 focus:ring-danger-200/50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed dark:from-danger-600 dark:to-danger-500 dark:hover:from-danger-500 dark:hover:to-danger-400 dark:focus:ring-danger-700/50;
 }
 
-.p-tree .p-treenode-content:hover {
-  @apply bg-neutral-50 dark:bg-neutral-700;
+:host ::ng-deep .p-button.p-component.btn-text {
+  @apply bg-transparent text-neutral-600 border border-neutral-200 rounded-xl font-medium px-3 py-2 transition-all duration-300 hover:text-primary-500 hover:bg-primary-50 hover:border-primary-200 hover:shadow-sm hover:scale-102 focus:ring-4 focus:ring-primary-100/50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed dark:text-neutral-300 dark:border-neutral-600 dark:hover:bg-primary-900/30 dark:hover:text-primary-400 dark:hover:border-primary-600 dark:focus:ring-primary-900/50;
 }
 
-.p-tree .p-treenode-label {
-  @apply text-neutral-700 dark:text-neutral-100;
+:host ::ng-deep .p-tree.p-component {
+  @apply rounded-xl bg-white dark:bg-neutral-800 p-4 shadow-soft transition-all duration-300;
 }
 
-.p-progressSpinner {
-  @apply w-8 h-8;
+:host ::ng-deep .p-tree-node-content:hover {
+  background: none !important;
+}
+
+:host ::ng-deep .p-tree-node-content > div > span {
+  display: block;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  max-width: 80% !important;
+  line-height: 1.5;
+  overflow: hidden !important;
 }

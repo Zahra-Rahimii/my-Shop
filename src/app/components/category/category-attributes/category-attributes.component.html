@@ -1,12 +1,12 @@
-<div class="max-w-6xl mx-auto p-6">
-  <div class="flex justify-between items-center mb-8 animate-fade-in">
+<div class="p-2 max-w-5xl mx-auto animate-fade-in">
+  <div class="flex justify-between items-center mb-8">
     <h2 class="text-2xl font-semibold text-neutral-800 dark:text-neutral-100">
       {{ node?.label || "دسته‌بندی" }}
     </h2>
     <button
       pButton
       (click)="goBack()"
-      class="btn-text flex items-center gap-2 px-4 py-2 text-primary-600 hover:bg-primary-100 dark:text-primary-400 dark:hover:bg-primary-900 rounded-xl transition-all duration-300 hover:scale-105 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-800"
+      class="btn-text flex items-center gap-2 px-3 py-2"
       icon="pi pi-arrow-right"
       label="بازگشت"
       aria-label="بازگشت به صفحه قبلی"
@@ -14,8 +14,8 @@
   </div>
 
   <form [formGroup]="attributeForm" class="card mb-8 pt-6 animate-fade-in">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="space-y-2">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+      <div class="space-y-2 flex flex-col">
         <label
           for="name"
           class="block text-sm font-medium text-neutral-700 dark:text-neutral-100"
@@ -25,7 +25,7 @@
           pInputText
           id="name"
           formControlName="name"
-          class="input-field"
+          class="input-field rounded-xl border border-neutral-200 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-100 px-3 py-2 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/50 focus:outline-none transition-all duration-200 hover:border-primary-200 dark:hover:border-primary-600 w-full"
           placeholder="نام ویژگی را وارد کنید"
           aria-required="true"
         />
@@ -37,7 +37,7 @@
         }
       </div>
 
-      <div class="space-y-2">
+      <div class="space-y-2 flex flex-col">
         <label
           for="type"
           class="block text-sm font-medium text-neutral-700 dark:text-neutral-100"
@@ -50,7 +50,7 @@
           optionLabel="label"
           optionValue="value"
           placeholder="نوع ویژگی را انتخاب کنید"
-          class="dropdown"
+          class="dropdown rounded-xl border border-neutral-200 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-100 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/50 transition-all duration-200 hover:border-primary-200 dark:hover:border-primary-600 w-full"
         ></p-dropdown>
         @if (attributeForm.get('type')?.touched &&
         attributeForm.get('type')?.invalid) {
@@ -60,17 +60,17 @@
         }
       </div>
 
-      <div class="space-y-2">
+      <div class="space-y-2 flex flex-col">
         <label
           for="required"
-          class="mb-4 block text-sm font-medium text-neutral-700 dark:text-neutral-100 font-body"
+          class="block text-sm font-medium text-neutral-700 dark:text-neutral-100"
           >اجباری</label
         >
         <p-checkbox
           id="required"
           formControlName="required"
           binary="true"
-          class="text-neutral-700 dark:text-neutral-100 font-body"
+          class="text-neutral-700 dark:text-neutral-100 align-self-start"
         ></p-checkbox>
       </div>
     </div>
@@ -82,7 +82,8 @@
         label="اضافه کردن ویژگی"
         (click)="addAttribute()"
         [disabled]="attributeForm.invalid"
-        class="btn-primary"
+        class="btn-primary px-4 py-2"
+        aria-label="اضافه کردن ویژگی"
       ></button>
     </div>
   </form>
@@ -104,7 +105,7 @@
   <div class="card overflow-hidden animate-fade-in">
     <p-table
       [value]="sortedAttributes"
-      class="w-full"
+      class="rounded-xl bg-neutral-50 dark:bg-neutral-800 shadow-soft transition-all duration-300"
       [tableStyle]="{ 'min-width': '50rem' }"
     >
       <ng-template pTemplate="header">
@@ -114,9 +115,7 @@
           <th class="px-6 py-3 text-right text-sm font-semibold">نام ویژگی</th>
           <th class="px-6 py-3 text-right text-sm font-semibold">نوع</th>
           <th class="px-6 py-3 text-right text-sm font-semibold">اجباری</th>
-          <th class="px-6 py-3 text-right text-sm font-semibold">
-            وضعیت ارث‌بری
-          </th>
+          <th class="px-6 py-3 text-right text-sm font-semibold">وضعیت ارث‌بری</th>
           <th class="px-6 py-3 text-right text-sm font-semibold">دسته‌بندی</th>
           <th class="px-6 py-3 text-right text-sm font-semibold">عملیات</th>
         </tr>
@@ -124,7 +123,7 @@
 
       <ng-template pTemplate="body" let-attr>
         <tr
-          class="hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all duration-200"
+          class="bg-neutral-50 dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-all duration-200"
         >
           <td class="px-6 py-3 text-sm text-neutral-700 dark:text-neutral-100">
             {{ attr.attributeName }}
@@ -163,7 +162,7 @@
               icon="pi pi-trash"
               class="btn-danger p-2"
               (click)="deleteAttribute(attr.id)"
-              label="حذف"
+              title="حذف"
               aria-label="حذف ویژگی"
             ></button>
             }

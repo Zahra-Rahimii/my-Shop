@@ -1,7 +1,7 @@
 <form
   [formGroup]="categoryForm"
   (ngSubmit)="onSubmit()"
-  class="card max-w-2xl mx-auto animate-fade-in"
+  class="card max-w-2xl mx-auto animate-fade-in bg-white dark:bg-neutral-800 rounded-xl shadow-soft transition-all duration-300 p-6"
 >
   <div class="space-y-6">
     <div class="space-y-2">
@@ -14,7 +14,7 @@
         pInputText
         id="name"
         formControlName="name"
-        class="input-field"
+        class="input-field w-full p-3 rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-700 placeholder-neutral-400 focus:ring-4 focus:ring-primary-100/50 focus:border-primary-300 transition-all duration-200 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-100 dark:placeholder-neutral-400 dark:focus:ring-primary-900/50 dark:focus:border-primary-600"
         placeholder="نام دسته را وارد کنید"
         aria-required="true"
       />
@@ -35,7 +35,7 @@
         pInputTextarea
         id="description"
         formControlName="description"
-        class="input-field min-h-[100px] resize-y"
+        class="input-field w-full p-3 rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-700 placeholder-neutral-400 focus:ring-4 focus:ring-primary-100/50 focus:border-primary-300 transition-all duration-200 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-100 dark:placeholder-neutral-400 dark:focus:ring-primary-900/50 dark:focus:border-primary-600 min-h-[100px] resize-y"
         placeholder="توضیحات دسته"
       ></textarea>
     </div>
@@ -56,7 +56,7 @@
         [filter]="true" 
         filterBy="label"
         filterMatchMode="contains"
-        class="dropdown w-full" 
+        class="w-full"
       ></p-dropdown>
     </div>
     <div class="space-y-2">
@@ -65,12 +65,12 @@
         >ویژگی جدید</label
       >
       <div
-        class="flex flex-wrap items-center gap-4 bg-neutral-50 p-4 rounded-xl dark:bg-neutral-800 animate-fade-in"
+        class="flex flex-wrap items-center gap-4 bg-neutral-50 p-4 rounded-xl dark:bg-neutral-700 dark:hover:bg-neutral-700 transition-all duration-200 animate-fade-in"
       >
         <input
           pInputText
           formControlName="attributeName"
-          class="input-field flex-1 min-w-[150px]"
+          class="input-field flex-1 min-w-[150px] p-3 rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-700 placeholder-neutral-400 focus:ring-4 focus:ring-primary-100/50 focus:border-primary-300 transition-all duration-200 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-100 dark:placeholder-neutral-400 dark:focus:ring-primary-900/50 dark:focus:border-primary-600"
           placeholder="نام ویژگی (مثل رنگ)"
           aria-required="true"
         />
@@ -80,7 +80,7 @@
           optionLabel="label"
           optionValue="value"
           placeholder="نوع ویژگی"
-          class="dropdown w-48"
+          class="w-48"
         ></p-dropdown>
         <p-checkbox
           formControlName="required"
@@ -109,9 +109,9 @@
     </div>
     @if(isLoadingAttributes()) {
     <div class="space-y-2">
-      <p-skeleton class="w-full h-8 animate-pulse"></p-skeleton>
-      <p-skeleton class="w-4/5 h-8 animate-pulse"></p-skeleton>
-      <p-skeleton class="w-3/5 h-8 animate-pulse"></p-skeleton>
+      <p-skeleton class="w-full h-8 rounded-xl animate-pulse"></p-skeleton>
+      <p-skeleton class="w-4/5 h-8 rounded-xl animate-pulse"></p-skeleton>
+      <p-skeleton class="w-3/5 h-8 rounded-xl animate-pulse"></p-skeleton>
     </div>
     } @if(categoryAttributes().length || inheritedAttributes().length) {
     <div class="space-y-3">
@@ -122,7 +122,7 @@
         @for(attr of inheritedAttributes(); track trackByAttribute($index,
         attr)) {
         <li
-          class="flex justify-between items-center bg-neutral-100 p-3 rounded-xl text-neutral-600 dark:bg-neutral-700 dark:text-neutral-200 opacity-90 animate-fade-in"
+          class="flex justify-between items-center bg-neutral-100 p-3 rounded-xl text-neutral-600 dark:bg-neutral-700 dark:text-neutral-200 opacity-90 animate-fade-in transition-all duration-200 hover:bg-neutral-200 dark:hover:bg-neutral-600"
         >
           <div>
             {{ attr.attributeName }} ({{ attr.attributeType }})
@@ -137,7 +137,7 @@
         } @for(attr of categoryAttributes(); track trackByAttribute($index,
         attr)) {
         <li
-          class="flex justify-between items-center bg-white p-3 rounded-xl border border-neutral-200 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-100 animate-fade-in"
+          class="flex justify-between items-center bg-white p-3 rounded-xl border border-neutral-200 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-100 animate-fade-in transition-all duration-200 hover:bg-neutral-100 dark:hover:bg-neutral-700"
         >
           <div>
             {{ attr.attributeName }} ({{ attr.attributeType }})
@@ -156,7 +156,7 @@
       </ul>
     </div>
     }
-    <div class="flex justify-end mt-6">
+    <div class="flex justify-end mt-6 gap-4">
       <button
         pButton
         type="submit"
