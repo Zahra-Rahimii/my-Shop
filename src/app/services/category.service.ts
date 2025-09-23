@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { BaseService } from './base.service';
 
 import { Category, CategoryDTO, CategoryTreeNodeDTO } from '../models/category.model';
@@ -16,11 +16,10 @@ export class CategoryService extends BaseService {
    * گرفتن درخت دسته‌بندی‌ها
    */
   getCategories(): Observable<CategoryTreeNodeDTO[]> {
-    return this.get<CategoryTreeNodeDTO[]>(this.treeEndpoint).pipe(
+    return this.get<CategoryTreeNodeDTO[]>(`${this.treeEndpoint}`).pipe(
       catchError(this.handleError)
     );
   }
-
   /**
    * گرفتن یک دسته‌بندی خاص
    */

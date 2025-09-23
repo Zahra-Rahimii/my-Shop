@@ -1,12 +1,28 @@
-<div class="dashboard">
-  <div class="dashboard-grid">
+<div
+  class="min-h-screen bg-neutral-50 p-6 font-body dark:bg-neutral-900 animate-fade-in"
+>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-7xl mx-auto">
     <div class="card">
-      <h2>درخت دسته‌بندی</h2>
-      <app-category-tree (nodeSelected)="onCategorySelected($event)" />
+      <h2
+        class="text-xl font-semibold text-neutral-800 dark:text-neutral-100 mb-4 text-center"
+      >
+        درخت دسته‌بندی
+      </h2>
+      <app-category-tree
+        (nodeSelected)="onCategorySelected($event)"
+        (editNode)="onEditNode($event)"
+      />
     </div>
     <div class="card">
-      <h2>مدیریت دسته‌بندی</h2>
-      <app-category-form [categoryId]="selectedCategoryId()" (categoryUpdated)="onCategoryUpdated()" />
+      <h2
+        class="text-xl font-semibold text-neutral-800 dark:text-neutral-100 mb-4 text-center"
+      >
+        مدیریت دسته‌بندی
+      </h2>
+      <app-category-form
+        [categoryId]="selectedCategoryId()"
+        (categoryUpdated)="onCategoryUpdated()"
+      />
     </div>
   </div>
 </div>

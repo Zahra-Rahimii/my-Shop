@@ -1,57 +1,96 @@
-<div class="container">
-  <div class="tree-container">
+<div class="p-2 max-w-full mx-auto animate-fade-in">
+  <div class="card relative">
+    @if (categoriesQuery.isLoading()) {
+    <div class="flex flex-col items-center gap-4 p-8">
+      <p-progressSpinner
+        class="w-8 h-8 animate-pulse"
+        aria-label="در حال بارگذاری دسته‌بندی‌ها"
+      ></p-progressSpinner>
+      <span class="text-neutral-600 dark:text-neutral-200"
+        >در حال بارگذاری...</span
+      >
+    </div>
+    } @else if (categoriesQuery.isError()) {
+    <div class="card text-center animate-fade-in">
+      <p-message
+        severity="error"
+        text="خطا در بارگذاری دسته‌بندی‌ها"
+        class="mb-4 rounded-xl"
+      ></p-message>
+      <button
+        pButton
+        type="button"
+        icon="pi pi-refresh"
+        class="btn-primary"
+        (click)="refreshCategories()"
+        label="تلاش مجدد"
+        aria-label="تلاش مجدد برای بارگذاری"
+      ></button>
+    </div>
+    } @else {
     <p-tree
       [value]="categories()"
       [lazy]="true"
       (onNodeExpand)="loadNode($event)"
       (onNodeSelect)="selectNode($event)"
       selectionMode="single"
+      class="animate-fade-in"
     >
       <ng-template let-node pTemplate="default">
-        <div class="node-content" [attr.aria-expanded]="node.expanded ? 'true' : 'false'" role="treeitem">
-          <span class="node-label">
+        <div class="max-w-96 flex items-center p-3 gap-4 bg-neutral-50 rounded-xl mb-2 hover:bg-neutral-100 dark:bg-neutral-800 dark:hover:bg-neutral-700 transition-all duration-200">
+          <span class="flex items-center gap-2 text-sm font-medium text-neutral-700 dark:text-neutral-100 w-2/5 min-w-0">
             @if (node.children && node.children.length) {
-              <i class="pi" [ngClass]="node.expanded ? 'pi-chevron-up' : 'pi-chevron-down'" (click)="toggleNode(node)" aria-label="باز و بسته کردن زیرمجموعه‌ها"></i>
+            <i
+             class="text-neutral-500 hover:text-primary-400 cursor-pointer transition-colors dark:text-neutral-200 dark:hover:text-primary-400 flex-shrink-0"              (click)="toggleNode(node)"
+              aria-label="باز و بسته کردن"
+            ></i>
             }
-            {{ node.label }}
+            <span class=" break-words">{{ node.label }}</span>
           </span>
-          <div class="node-actions">
-            <button
+  <div class="flex gap-2 w-3/5 flex-shrink-0 justify-end">
+                <button
               pButton
               type="button"
               icon="pi pi-list"
-              class="show-attributes-btn"
+              class="btn-text p-2"
               (click)="showAttributesDialog(node)"
               title="نمایش ویژگی‌ها"
               [disabled]="!node.data?.id || isLoadingAttributes()"
-              aria-label="نمایش ویژگی‌های دسته‌بندی"
+              aria-label="نمایش ویژگی‌ها"
             ></button>
             <button
               pButton
               type="button"
               icon="pi pi-pencil"
-              class="edit-btn"
-              (click)="selectNode({ node })"
-              title="ویرایش دسته‌بندی"
+              class="btn-text p-2"
+              (click)="editCategory(node)"
+              title="ویرایش"
               [disabled]="!node.data?.id"
-              aria-label="ویرایش دسته‌بندی"
+              aria-label="ویرایش دسته"
             ></button>
             <button
               pButton
               type="button"
               icon="pi pi-trash"
-              class="p-button-danger delete-btn"
+              class="btn-danger p-2"
               (click)="deleteCategory(node.data.id)"
-              title="حذف دسته‌بندی"
+              title="حذف"
               [disabled]="!node.data?.id"
-              aria-label="حذف دسته‌بندی"
+              aria-label="حذف دسته"
             ></button>
           </div>
         </div>
       </ng-template>
     </p-tree>
     @if (isLoadingAttributes()) {
-      <p-progressSpinner aria-label="در حال بارگذاری ویژگی‌ها"></p-progressSpinner>
-    }
+    <div
+      class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 rounded-xl dark:bg-neutral-900 dark:bg-opacity-75"
+    >
+      <p-progressSpinner
+        class="w-8 h-8 animate-pulse"
+        aria-label="در حال بارگذاری ویژگی‌ها"
+      ></p-progressSpinner>
+    </div>
+    } }
   </div>
 </div>

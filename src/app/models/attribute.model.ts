@@ -22,3 +22,4 @@ export interface CategoryAttributeDTO {
   categoryName: string;
   inherited: boolean;
 }
+
