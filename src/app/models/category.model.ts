@@ -9,7 +9,7 @@ export interface Category {
   id: number;
   name: string;
   description?: string;
-  parentId?: number | null;
+  parentId: number | null;
   children?: Category[];
 }
 
@@ -27,5 +27,7 @@ export interface CategoryTreeNodeDTO {
   children?: CategoryTreeNodeDTO[];
   attributes?: CategoryAttributeDTO[];
 }
+
+
 
 

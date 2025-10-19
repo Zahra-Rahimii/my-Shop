@@ -1,5 +1,32 @@
-<p-menubar class="p-menubar" [model]="items" role="menubar" aria-label="منوی اصلی ناوبری">
+<p-menubar
+  class="w-full fixed top-0 left-0 border-b border-neutral-200 bg-white dark:bg-neutral-800 dark:border-neutral-700 rounded-b-xl shadow-soft z-50"
+  [model]="items"
+  role="menubar"
+  aria-label="منوی اصلی ناوبری"
+>
   <ng-template pTemplate="start">
-    <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" aria-label="آواتار کاربر"></p-avatar>
+    <p-avatar
+      image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"
+      shape="circle"
+      size="large"
+      class="ms-4"
+      aria-label="آواتار کاربر"
+    >
+    </p-avatar>
+  </ng-template>
+
+  <ng-template pTemplate="end">
+    <button
+      (click)="toggleDarkMode()"
+      class="btn-text me-auto px-3 py-2"
+      aria-label="تغییر تم"
+    >
+      <i
+        class="pi"
+        [ngClass]="isDarkMode ? 'pi-sun' : 'pi-moon'"
+        style="font-size: 1.5rem"
+      >
+      </i>
+    </button>
   </ng-template>
 </p-menubar>

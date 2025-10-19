@@ -1,0 +1,181 @@
+<div class="p-2 max-w-5xl mx-auto animate-fade-in">
+  <div class="flex justify-between items-center mb-8">
+    <h2 class="text-2xl font-semibold text-neutral-800 dark:text-neutral-100">
+      {{ node?.label || "دسته‌بندی" }}
+    </h2>
+    <button
+      pButton
+      (click)="goBack()"
+      class="btn-text flex items-center gap-2 px-3 py-2"
+      icon="pi pi-arrow-right"
+      label="بازگشت"
+      aria-label="بازگشت به صفحه قبلی"
+    ></button>
+  </div>
+
+  <form [formGroup]="attributeForm" class="card mb-8 pt-6 animate-fade-in">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+      <div class="space-y-2 flex flex-col">
+        <label
+          for="name"
+          class="block text-sm font-medium text-neutral-700 dark:text-neutral-100"
+          >نام ویژگی</label
+        >
+        <input
+          pInputText
+          id="name"
+          formControlName="name"
+          class="input-field rounded-xl border border-neutral-200 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-100 px-3 py-2 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/50 focus:outline-none transition-all duration-200 hover:border-primary-200 dark:hover:border-primary-600 w-full"
+          placeholder="نام ویژگی را وارد کنید"
+          aria-required="true"
+        />
+        @if (attributeForm.get('name')?.touched &&
+        attributeForm.get('name')?.invalid) {
+        <span class="text-danger-500 text-sm dark:text-danger-400"
+          >نام ویژگی اجباری است</span
+        >
+        }
+      </div>
+
+      <div class="space-y-2 flex flex-col">
+        <label
+          for="type"
+          class="block text-sm font-medium text-neutral-700 dark:text-neutral-100"
+          >نوع ویژگی</label
+        >
+        <p-dropdown
+          id="type"
+          formControlName="type"
+          [options]="attributeTypes()"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="نوع ویژگی را انتخاب کنید"
+          class="dropdown rounded-xl border border-neutral-200 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-100 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/50 transition-all duration-200 hover:border-primary-200 dark:hover:border-primary-600 w-full"
+        ></p-dropdown>
+        @if (attributeForm.get('type')?.touched &&
+        attributeForm.get('type')?.invalid) {
+        <span class="text-danger-500 text-sm dark:text-danger-400"
+          >نوع ویژگی اجباری است</span
+        >
+        }
+      </div>
+
+      <div class="space-y-2 flex flex-col">
+        <label
+          for="required"
+          class="block text-sm font-medium text-neutral-700 dark:text-neutral-100"
+          >اجباری</label
+        >
+        <p-checkbox
+          id="required"
+          formControlName="required"
+          binary="true"
+          class="text-neutral-700 dark:text-neutral-100 align-self-start"
+        ></p-checkbox>
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end">
+      <button
+        pButton
+        type="button"
+        label="اضافه کردن ویژگی"
+        (click)="addAttribute()"
+        [disabled]="attributeForm.invalid"
+        class="btn-primary px-4 py-2"
+        aria-label="اضافه کردن ویژگی"
+      ></button>
+    </div>
+  </form>
+
+  @if (isLoading) {
+  <div class="flex justify-center p-6">
+    <p-progressSpinner
+      class="w-8 h-8 animate-pulse"
+      aria-label="در حال بارگذاری ویژگی‌ها"
+    ></p-progressSpinner>
+  </div>
+  } @else if (isError) {
+  <div
+    class="card text-danger-500 text-center p-6 dark:text-danger-400 animate-fade-in"
+  >
+    خطا: {{ query.error()?.message || "خطایی رخ داد" }}
+  </div>
+  } @else { @if (node?.data?.attributes?.length) {
+  <div class="card overflow-hidden animate-fade-in">
+    <p-table
+      [value]="sortedAttributes"
+      class="rounded-xl bg-neutral-50 dark:bg-neutral-800 shadow-soft transition-all duration-300"
+      [tableStyle]="{ 'min-width': '50rem' }"
+    >
+      <ng-template pTemplate="header">
+        <tr
+          class="bg-neutral-50 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-100"
+        >
+          <th class="px-6 py-3 text-right text-sm font-semibold">نام ویژگی</th>
+          <th class="px-6 py-3 text-right text-sm font-semibold">نوع</th>
+          <th class="px-6 py-3 text-right text-sm font-semibold">اجباری</th>
+          <th class="px-6 py-3 text-right text-sm font-semibold">وضعیت ارث‌بری</th>
+          <th class="px-6 py-3 text-right text-sm font-semibold">دسته‌بندی</th>
+          <th class="px-6 py-3 text-right text-sm font-semibold">عملیات</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-attr>
+        <tr
+          class="bg-neutral-50 dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-all duration-200"
+        >
+          <td class="px-6 py-3 text-sm text-neutral-700 dark:text-neutral-100">
+            {{ attr.attributeName }}
+          </td>
+          <td class="px-6 py-3 text-sm text-neutral-700 dark:text-neutral-100">
+            {{ attr.attributeType }}
+          </td>
+          <td class="px-6 py-3 text-sm">
+            <i
+              class="pi"
+              [ngClass]="
+                attr.required
+                  ? 'pi-check text-success-500'
+                  : 'pi-times text-danger-500'
+              "
+            ></i>
+          </td>
+          <td class="px-6 py-3 text-sm text-neutral-600 dark:text-neutral-200">
+            @if (attr.inherited) {
+            <span class="flex items-center gap-2">
+              <i class="pi pi-link text-primary-500"></i>
+              ارث‌بری‌شده از: {{ attr.categoryName }}
+            </span>
+            } @else {
+            <span>غیرارثی</span>
+            }
+          </td>
+          <td class="px-6 py-3 text-sm text-neutral-700 dark:text-neutral-100">
+            {{ attr.categoryName }}
+          </td>
+          <td class="px-6 py-3 text-sm">
+            @if (!attr.inherited) {
+            <button
+              pButton
+              type="button"
+              icon="pi pi-trash"
+              class="btn-danger p-2"
+              (click)="deleteAttribute(attr.id)"
+              title="حذف"
+              aria-label="حذف ویژگی"
+            ></button>
+            }
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  } @else {
+  <div
+    class="card text-center p-6 text-neutral-500 dark:text-neutral-200 animate-fade-in"
+  >
+    هیچ ویژگی‌ای وجود ندارد
+  </div>
+  } }
+</div>

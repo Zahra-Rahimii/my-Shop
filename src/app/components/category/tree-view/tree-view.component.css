@@ -1,120 +1,33 @@
-.tree-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 1.5rem;
-  background: #ffffff;
-  border-radius: 8px;
-  border: 1px solid #d1d5db; 
-  color: #1e293b; 
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); 
-  max-width: 600px;
-  margin: 1.5rem auto;
-  font-family: 'iran_yekan', sans-serif;
+:host {
+  display: block;
+  margin-top: 7rem;
 }
 
-
-.p-tree .p-treenode-content {
-  display: flex;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  margin-bottom: 0.5rem;
-  border-radius: 6px;
-  background: #f8fafc; 
-  color: #1e293b;
-  font-weight: 500;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+:host {
+  display: block;
 }
 
-.p-tree .p-treenode-content:hover {
-  background: #e2e8f0; 
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+:host ::ng-deep .p-button.p-component.btn-danger {
+  @apply bg-gradient-to-r from-danger-300 to-danger-200 text-white border border-danger-300 rounded-xl font-medium px-4 py-2 transition-all duration-300 hover:from-danger-600 hover:to-danger-500 hover:border-danger-600 hover:shadow-md hover:scale-102 focus:ring-4 focus:ring-danger-200/50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed dark:from-danger-600 dark:to-danger-500 dark:hover:from-danger-500 dark:hover:to-danger-400 dark:focus:ring-danger-700/50;
 }
 
-.p-tree .p-treenode-children {
-  margin-left: 1.5rem;
-  border-left: 2px solid #d1d5db;
-  padding-left: 0.75rem;
+:host ::ng-deep .p-button.p-component.btn-text {
+  @apply bg-transparent text-neutral-600 border border-neutral-200 rounded-xl font-medium px-3 py-2 transition-all duration-300 hover:text-primary-500 hover:bg-primary-50 hover:border-primary-200 hover:shadow-sm hover:scale-102 focus:ring-4 focus:ring-primary-100/50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed dark:text-neutral-300 dark:border-neutral-600 dark:hover:bg-primary-900/30 dark:hover:text-primary-400 dark:hover:border-primary-600 dark:focus:ring-primary-900/50;
 }
 
-.p-tree .p-treenode-toggler {
-  margin-right: 0.5rem;
-  width: 1.1rem;
-  height: 1.1rem;
-  border-radius: 50%;
-  background: #e2e8f0;
-  color: #1e293b;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-  transition: background 0.2s ease, transform 0.2s ease;
+:host ::ng-deep .p-tree.p-component {
+  @apply rounded-xl bg-white dark:bg-neutral-800 p-4 shadow-soft transition-all duration-300;
 }
 
-.p-tree .p-treenode-toggler:hover {
-  background: #60a5fa;
-  color: #ffffff;
+:host ::ng-deep .p-tree-node-content:hover {
+  background: none !important;
 }
 
-.p-tree .p-treenode-toggler.p-treenode-toggler-collapsed {
-  transform: rotate(-90deg);
-}
-
-.p-tree .p-treenode-label {
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 0.95rem;
-}
-
-.p-tree .p-treenode-content.p-highlight {
-  background: #e2e8f0;
-  color: #1e293b;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.p-tree .p-treenode-children .p-treenode-children {
-  margin-left: 1rem;
-}
-
-.icon-btn {
-  background: transparent;
-  border: none;
-  color: #4b5563; 
-  padding: 0.25rem;
-  font-size: 1rem;
-  transition: color 0.2s ease;
-}
-
-.icon-btn:hover {
-  color: #60a5fa;
-}
-
-.attributes-dialog .p-dialog-content {
-  background: #ffffff; 
-  color: #1e293b;
-  border-radius: 6px;
-  padding: 1rem;
-  font-family: 'iran_yekan', sans-serif;
-}
-
-.attributes-dialog .p-dialog-content > div > div {
-  font-size: 0.9rem;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #d1d5db; 
-}
-
-.attributes-dialog .p-dialog-content > div > div:last-child {
-  border-bottom: none;
-}
-
-.no-attributes {
-  font-size: 0.9rem;
-  color: #4b5563; 
-  padding: 0.5rem;
-  text-align: center;
+:host ::ng-deep .p-tree-node-content > div > span {
+  display: block;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  max-width: 80% !important;
+  line-height: 1.5;
+  overflow: hidden !important;
 }

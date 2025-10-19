@@ -1,0 +1,47 @@
+:host {
+  display: block;
+}
+
+:host ::ng-deep .p-button.p-component.btn-danger {
+  @apply bg-gradient-to-r from-danger-300 to-danger-200 text-white border border-danger-300 rounded-xl font-medium px-4 py-2 transition-all duration-300 hover:from-danger-600 hover:to-danger-500 hover:border-danger-600 hover:shadow-md hover:scale-102 focus:ring-4 focus:ring-danger-200/50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed dark:from-danger-600 dark:to-danger-500 dark:hover:from-danger-500 dark:hover:to-danger-400 dark:focus:ring-danger-700/50;
+}
+
+:host ::ng-deep .p-button.p-component.btn-text {
+  @apply bg-transparent text-neutral-600 border border-neutral-200 rounded-xl font-medium px-3 py-2 transition-all duration-300 hover:text-primary-500 hover:bg-primary-50 hover:border-primary-200 hover:shadow-sm hover:scale-102 focus:ring-4 focus:ring-primary-100/50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed dark:text-neutral-300 dark:border-neutral-600 dark:hover:bg-primary-900/30 dark:hover:text-primary-400 dark:hover:border-primary-600 dark:focus:ring-primary-900/50;
+}
+
+:host ::ng-deep .p-button.p-component.btn-primary {
+  @apply bg-gradient-to-r from-primary-300 to-primary-200 text-white border border-primary-300 rounded-xl font-medium px-4 py-2 transition-all duration-300 hover:from-primary-600 hover:to-primary-500 hover:border-primary-600 hover:shadow-md hover:scale-102 focus:ring-4 focus:ring-primary-200/50 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed dark:from-primary-600 dark:to-primary-500 dark:hover:from-primary-500 dark:hover:to-primary-400 dark:focus:ring-primary-700/50;
+}
+
+:host ::ng-deep .p-table.p-component {
+  @apply rounded-xl bg-neutral-50 dark:bg-neutral-800 p-4 shadow-soft transition-all duration-300;
+}
+
+:host ::ng-deep .p-card.p-component {
+  @apply rounded-xl bg-neutral-50 dark:bg-neutral-800 p-4 shadow-soft transition-all duration-300;
+}
+
+:host ::ng-deep .p-inputtext.p-component {
+  @apply rounded-xl border border-neutral-200 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-100 px-3 py-2 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/50 focus:outline-none transition-all duration-200 hover:border-primary-200 dark:hover:border-primary-600 w-full;
+}
+
+:host ::ng-deep .p-dropdown.p-component {
+  @apply rounded-xl border border-neutral-200 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-100 focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-900/50 transition-all duration-200 hover:border-primary-200 dark:hover:border-primary-600 w-full;
+}
+
+:host ::ng-deep .p-checkbox .p-checkbox-box {
+  @apply border border-neutral-200 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-100 rounded-md h-5 w-5;
+}
+
+:host ::ng-deep .p-checkbox .p-checkbox-box.p-highlight {
+  @apply bg-primary-500 border-primary-500 text-white dark:bg-primary-600 dark:border-primary-600;
+}
+
+:host ::ng-deep .p-table .p-datatable-tbody > tr {
+  @apply bg-neutral-50 dark:bg-neutral-800;
+}
+
+:host ::ng-deep .p-table .p-datatable-tbody > tr:hover {
+  @apply bg-neutral-100 dark:bg-neutral-700;
+}
